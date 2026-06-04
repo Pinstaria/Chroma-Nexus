@@ -3,8 +3,9 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>CHROMA NEXUS // ULTIMATE SYSTEM</title>
-    <!-- Firebase SDK -->
+    <title>CHROMA NEXUS</title>
+    <link rel="icon" href="data:,">
+    
     <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
     <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-firestore.js"></script>
     <link href="https://fonts.googleapis.com/css2?family=Rajdhani:wght@500;700&family=Share+Tech+Mono&display=swap" rel="stylesheet">
@@ -70,7 +71,6 @@
 
     <div id="notification-hub"></div>
 
-    <!-- INITIALIZATION -->
     <div id="setup-screen" class="screen active" style="align-items: center; justify-content: center;">
         <div class="glass" style="width: 100%; max-width: 650px; text-align: center;">
             <h1 class="glow-cyan" style="font-size: 3.5rem; margin-bottom: 5px;">CHROMA NEXUS</h1>
@@ -92,7 +92,6 @@
         </div>
     </div>
 
-    <!-- LOBBY SCREEN -->
     <div id="lobby-screen" class="screen" style="align-items: center; justify-content: center;">
         <div class="glass" style="width: 100%; max-width: 600px; text-align: center;">
             <h2 class="glow-cyan" style="font-size: 2.5rem;">NODE LOBBY: <span id="lobby-code-display" class="glow-pink"></span></h2>
@@ -105,7 +104,6 @@
         </div>
     </div>
 
-    <!-- DASHBOARD -->
     <div id="game-screen" class="screen">
         <header id="hud" class="glass">
             <div class="stat-box"><span class="stat-label">Node ID</span> <div id="hud-party" class="stat-val glow-cyan">---</div></div>
@@ -137,15 +135,12 @@
         </main>
     </div>
 
-    <!-- MODALS -->
-    <!-- Pack Opening -->
     <div id="pack-overlay" class="overlay">
         <h2 id="pack-title" class="glow-cyan" style="font-size: 2.2rem;">DECRYPTING CACHE...</h2>
         <div id="pack-cards" class="drawn-container"></div>
         <button onclick="closeOverlay('pack-overlay')" id="btn-pack-close" style="margin-top: 30px; display: none; font-size: 1.2rem; padding: 12px 30px;">ACKNOWLEDGE</button>
     </div>
 
-    <!-- Wager System -->
     <div id="wager-overlay" class="overlay">
         <div class="modal" style="text-align: center; max-width: 450px;">
             <h2 class="glow-pink">ROGUE WAGER</h2>
@@ -155,7 +150,6 @@
         </div>
     </div>
 
-    <!-- Pending Incoming Trades -->
     <div id="incoming-overlay" class="overlay">
         <div class="modal" style="width: 700px;">
             <div style="display: flex; justify-content: space-between; margin-bottom: 20px;">
@@ -166,7 +160,6 @@
         </div>
     </div>
 
-    <!-- Send Trade Hub -->
     <div id="hub-overlay" class="overlay">
         <div class="modal">
             <div style="display: flex; justify-content: space-between;"><h2>ESTABLISH UPLINK</h2><button onclick="closeOverlay('hub-overlay')">X</button></div>
@@ -175,7 +168,6 @@
         </div>
     </div>
 
-    <!-- Active Trade P2P UI -->
     <div id="trade-overlay" class="overlay">
         <div class="modal" style="width: 900px;">
             <h2 id="trade-status" class="glow-cyan" style="text-align: center;">ESTABLISHING UPLINK...</h2>
@@ -196,7 +188,6 @@
                         <span class="stat-val" style="color: #fff; margin-left: 10px;">$<span id="trade-their-cash">0</span></span>
                     </div>
                     <div class="trade-zone" id="trade-their-offer" style="border-color: rgba(255,0,85,0.3);"></div>
-                    <!-- View Their Inventory Box added as requested! -->
                     <h4 style="margin-top: 15px; color: #666; font-size: 0.8rem;">THEIR ASSETS:</h4>
                     <div style="max-height: 110px; overflow-y: auto; border-top: 1px solid #333; margin-top: 5px; padding-top: 10px; display: flex; gap: 5px; flex-wrap: wrap;" id="trade-their-inv"></div>
                 </div>
@@ -208,7 +199,6 @@
         </div>
     </div>
 
-    <!-- Global Dex -->
     <div id="dex-overlay" class="overlay">
         <div class="modal" style="width: 95%;">
             <div style="display: flex; justify-content: space-between; margin-bottom: 15px;"><h2 class="glow-cyan">GLOBAL DEX</h2><button onclick="closeOverlay('dex-overlay')">X</button></div>
@@ -222,9 +212,9 @@
         // ==========================================
         // 1. FIREBASE SETUP
         // ==========================================
-        // // Import the functions you need from the SDKs you need
+        // PASTE YOUR REAL CONFIG OBJECT HERE:
+        // Import the functions you need from the SDKs you need
 
-// For Firebase JS SDK v7.20.0 and later, measurementId is optional
         const firebaseConfig = {
             apiKey: "AIzaSyAActFtDrgVBq8wAOujPzETSDaU3nhtjhU",
             authDomain: "packian.firebaseapp.com",
@@ -275,7 +265,6 @@
         const STD_PACKS = PACK_DATA.map((p, i) => {
             let baseVal = Math.max(10, PACK_PRICES[i] / 5);
             let colors = p.data.map((c, j) => {
-                // Hyper-specific unique sell price for every single color
                 let uniqueVal = Math.floor(baseVal * Math.pow(1.6, j) + (cId * 11) + 7);
                 let inst = { id: `C${cId++}`, name: c[0], hex: c[1], val: uniqueVal };
                 POOL.std.push(inst); ALL_COLORS.set(inst.id, inst);
@@ -309,14 +298,14 @@
         function notifyCenter(msg, btnText, btnAction) {
             sfx.alert();
             const b = document.getElementById('notification-hub'); const t = document.createElement('div'); t.className = 'toast';
-            t.innerHTML = `<span>${msg}</span> <button class="btn-pink" style="padding:6px 15px; font-size:1rem;" id="toast-btn-${Date.now()}">${btnText}</button>`;
+            t.innerHTML = `<span>${msg}</span> <button class="btn-pink" style="padding:6px 15px; font-size:1rem;">${btnText}</button>`;
             b.appendChild(t);
             t.querySelector('button').onclick = () => { t.remove(); if(btnAction) btnAction(); };
             setTimeout(() => { if(t.parentElement) t.remove(); }, 8000);
         }
 
         // ==========================================
-        // 4. GAME STATE & LOBBY LOGIC
+        // 4. GAME STATE & ERROR HANDLING
         // ==========================================
         let state = { name: "", code: null, isHost: false, status: 'setup', cash: 50, inv: [], dex: new Set(), endTime: 0, nextEv: 0, evActive: false, players: {}, freeReady: true };
         let subs = []; let loop; let tId = null; let myOffer = { cash: 0, cols: [] };
@@ -326,21 +315,29 @@
         function closeOverlay(id) { document.getElementById(id).style.display = 'none'; sfx.click(); }
 
         async function hostGame() {
-            const name = document.getElementById('playerName').value.trim().toUpperCase();
-            if(!name) return alert("ALIAS REQUIRED");
-            const code = Math.random().toString(36).substr(2,6).toUpperCase();
-            state.name = name; state.code = code; state.isHost = true;
-            await db.collection('games').doc(code).set({ host: name, status: 'lobby' });
-            joinLobby(code, name);
+            try {
+                const name = document.getElementById('playerName').value.trim().toUpperCase();
+                if(!name) return notifyCenter("ALIAS REQUIRED", "DISMISS");
+                const code = Math.random().toString(36).substr(2,6).toUpperCase();
+                state.name = name; state.code = code; state.isHost = true;
+                await db.collection('games').doc(code).set({ host: name, status: 'lobby' });
+                joinLobby(code, name);
+            } catch(e) {
+                console.error(e); notifyCenter("DATABASE ERROR: Check Firestore Rules", "DISMISS");
+            }
         }
 
         async function joinGame() {
-            const name = document.getElementById('playerName').value.trim().toUpperCase();
-            const code = document.getElementById('partyCodeInput').value.trim().toUpperCase();
-            if(!name || !code) return alert("DATA MISSING");
-            const doc = await db.collection('games').doc(code).get();
-            if(!doc.exists || doc.data().status === 'ended') return alert("NODE INVALID");
-            joinLobby(code, name);
+            try {
+                const name = document.getElementById('playerName').value.trim().toUpperCase();
+                const code = document.getElementById('partyCodeInput').value.trim().toUpperCase();
+                if(!name || !code) { notifyCenter("DATA MISSING: Enter Alias & Code", "DISMISS"); return; }
+                const doc = await db.collection('games').doc(code).get();
+                if(!doc.exists || doc.data().status === 'ended') return notifyCenter("NODE INVALID OR OFFLINE", "DISMISS");
+                joinLobby(code, name);
+            } catch(e) {
+                console.error(e); notifyCenter("DATABASE ERROR: Check Firestore Rules", "DISMISS");
+            }
         }
 
         function joinLobby(code, name) {
@@ -349,7 +346,6 @@
 
             subs.push(db.collection('games').doc(code).onSnapshot(s => {
                 let d = s.data(); 
-                // CRITICAL FIX: If host leaves, document is deleted and d is null. Ends game for everyone.
                 if(!s.exists || !d || d.status === 'ended') { endGame(); return; }
 
                 if(d.status === 'lobby') {
@@ -394,6 +390,7 @@
         }
 
         function addBot() {
+            if(!state.code) return; // Prevent empty path error if host fails
             let bName = "BOT_" + Math.random().toString(36).substr(2,4).toUpperCase(); let bItems = [];
             for(let i=0; i<10; i++) bItems.push(POOL.std[Math.floor(Math.random()*POOL.std.length)].id);
             db.collection('games').doc(state.code).collection('players').doc(bName).set({ cash: 15000, invSize: 10, items: bItems, isBot: true });
@@ -441,13 +438,13 @@
             packs.forEach(p => {
                 const c = document.createElement('div'); c.className = 'item-card'; if(p.isEvent) c.style.borderColor = "var(--pink)";
                 c.innerHTML = `<h4 style="color:${p.isEvent?'var(--pink)':'var(--cyan)'}; font-size:1rem;">${p.name}</h4><p class="stat-val">$${p.cost.toLocaleString()}</p><button style="margin-top:10px; width:100%;" class="${p.isEvent?'btn-pink':''}">PULL</button>`;
-                c.querySelector('button').onclick = (e) => { e.stopPropagation(); if(state.cash >= p.cost) { sfx.buy(); updateCash(-p.cost); processWeightedDraw(p.colors); } else sfx.alert(); };
+                c.querySelector('button').onclick = (e) => { e.stopPropagation(); if(state.cash >= p.cost) { sfx.buy(); updateCash(-p.cost); processWeightedDraw(p.colors); } else { notifyCenter("INSUFFICIENT FUNDS", "DISMISS"); sfx.alert(); }};
                 g.appendChild(c);
             });
 
             const btnZenith = document.createElement('div'); btnZenith.className = 'item-card'; btnZenith.style.borderColor = 'var(--gold)';
             btnZenith.innerHTML = `<h4 style="color:var(--gold); font-size:1rem;">OMNI-ZENITH</h4><p class="stat-val" style="color:var(--gold);">$500,000</p><button style="margin-top:10px; width:100%;" class="btn-gold">PULL</button>`;
-            btnZenith.querySelector('button').onclick = (e) => { e.stopPropagation(); if(state.cash >= 500000) { sfx.buy(); updateCash(-500000); processWeightedDraw(POOL.high); } else sfx.alert(); };
+            btnZenith.querySelector('button').onclick = (e) => { e.stopPropagation(); if(state.cash >= 500000) { sfx.buy(); updateCash(-500000); processWeightedDraw(POOL.high); } else { notifyCenter("INSUFFICIENT FUNDS", "DISMISS"); sfx.alert(); }};
             g.appendChild(btnZenith);
         }
 
@@ -559,7 +556,6 @@
             document.getElementById('trade-my-offer').innerHTML = myOffer.cols.map((c,i) => `<div class="mini-color" style="background:${c.hex}; border-color:${c.x}" onclick="removeTradeItem(${i})"></div>`).join('');
             document.getElementById('trade-my-inv').innerHTML = state.inv.map((c,i) => `<div class="mini-color" style="background:${c.hex}; border-color:${c.x}" onclick="addTradeItem(${i})"></div>`).join('');
 
-            // CRITICAL FIX: Render "Their Inventory" so you can visually see what the other player holds during the trade!
             let theirData = state.players[theirName];
             if (theirData && theirData.items) {
                 document.getElementById('trade-their-inv').innerHTML = theirData.items.map(id => {
@@ -598,6 +594,7 @@
         }
 
         function executeBotAI() {
+            if(state.status !== 'active') return;
             let bots = Object.keys(state.players).filter(p => state.players[p].isBot); if(bots.length === 0) return;
             let botId = bots[Math.floor(Math.random() * bots.length)]; let bot = state.players[botId];
             let humans = Object.keys(state.players).filter(p => !state.players[p].isBot); if(humans.length === 0) return;
@@ -639,6 +636,7 @@
         }
 
         function triggerPersonalEvent() {
+            if(state.status !== 'active') return;
             if(Math.random() > 0.5 && state.inv.length > 0) {
                 let c = state.inv[Math.floor(Math.random() * state.inv.length)];
                 let off = Math.floor(c.val * (1.1 + Math.random()));
