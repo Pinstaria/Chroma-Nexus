@@ -3,7 +3,8 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>CHROMA NEXUS</title>
+    <title>CHROMA NEXUS // V6.0</title>
+    <!-- Silences favicon error -->
     <link rel="icon" href="data:,">
     
     <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
@@ -55,9 +56,11 @@
         .card-face { position: absolute; width: 100%; height: 100%; backface-visibility: hidden; border-radius: 6px; display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 10px; }
         .card-back { background: repeating-linear-gradient(45deg, #111, #111 10px, #222 10px, #222 20px); border: 2px solid #444; transform: rotateY(180deg); } .card-front { background: #05050A; border: 2px solid; }
 
+        /* Asynchronous Trading UI Styles */
         .trade-arena { display: flex; gap: 20px; margin-top: 20px; } .trade-side { flex: 1; border: 1px solid #333; padding: 15px; border-radius: 6px; background: rgba(0,0,0,0.4); }
-        .trade-zone { min-height: 80px; margin-top: 10px; padding: 10px; background: #000; border: 1px dashed #555; display: flex; gap: 5px; flex-wrap: wrap; align-items: flex-start; }
-        .mini-color { width: 35px; height: 35px; border-radius: 4px; cursor: pointer; border: 1px solid #fff; transition: 0.1s; } .mini-color:hover { transform: scale(1.1); }
+        .trade-zone { min-height: 100px; margin-top: 10px; padding: 10px; background: #000; border: 1px dashed #555; display: flex; flex-direction: column; gap: 5px; overflow-y: auto; max-height: 150px;}
+        .trade-item-row { display: flex; align-items: center; justify-content: space-between; background: rgba(255,255,255,0.05); padding: 5px 10px; border-radius: 4px; border-left: 3px solid; cursor: pointer; transition: 0.1s; }
+        .trade-item-row:hover { background: rgba(255,255,255,0.1); }
         
         #notification-hub { position: fixed; top: 20px; left: 50%; transform: translateX(-50%); display: flex; flex-direction: column; gap: 10px; z-index: 9999; pointer-events: none; }
         .toast { background: rgba(0,240,255,0.1); border: 1px solid var(--cyan); padding: 15px 30px; font-family: var(--font-head); font-size: 1.3rem; animation: dropDown 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards; backdrop-filter: blur(10px); box-shadow: 0 5px 20px rgba(0,0,0,0.8); pointer-events: auto; display: flex; align-items: center; justify-content: space-between; gap: 20px; border-radius: 6px; }
@@ -71,6 +74,7 @@
 
     <div id="notification-hub"></div>
 
+    <!-- INITIALIZATION -->
     <div id="setup-screen" class="screen active" style="align-items: center; justify-content: center;">
         <div class="glass" style="width: 100%; max-width: 650px; text-align: center;">
             <h1 class="glow-cyan" style="font-size: 3.5rem; margin-bottom: 5px;">CHROMA NEXUS</h1>
@@ -92,6 +96,7 @@
         </div>
     </div>
 
+    <!-- LOBBY SCREEN -->
     <div id="lobby-screen" class="screen" style="align-items: center; justify-content: center;">
         <div class="glass" style="width: 100%; max-width: 600px; text-align: center;">
             <h2 class="glow-cyan" style="font-size: 2.5rem;">NODE LOBBY: <span id="lobby-code-display" class="glow-pink"></span></h2>
@@ -104,6 +109,7 @@
         </div>
     </div>
 
+    <!-- DASHBOARD -->
     <div id="game-screen" class="screen">
         <header id="hud" class="glass">
             <div class="stat-box"><span class="stat-label">Node ID</span> <div id="hud-party" class="stat-val glow-cyan">---</div></div>
@@ -113,7 +119,7 @@
             <div style="display: flex; gap: 10px;">
                 <button onclick="openTradeHub()">NETWORK HUB</button>
                 <button onclick="openIncomingTrades()" style="border-color: var(--gold); color: var(--gold); position: relative;">
-                    INCOMING <span id="trade-badge" style="background: var(--alert); color: #fff; padding: 2px 6px; border-radius: 50%; font-size: 0.8rem; display: none; position: absolute; top: -10px; right: -10px;">0</span>
+                    INBOX <span id="trade-badge" style="background: var(--alert); color: #fff; padding: 2px 6px; border-radius: 50%; font-size: 0.8rem; display: none; position: absolute; top: -10px; right: -10px;">0</span>
                 </button>
                 <button onclick="openGlobalDex()" class="btn-pink">GLOBAL DEX</button>
             </div>
@@ -128,13 +134,14 @@
             <div class="glass panel">
                 <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px;">
                     <h2>Inventory</h2>
-                    <div style="text-align: right;"><span class="stat-label">Unique Spectrum</span><br><span id="unique-count" class="stat-val glow-cyan">0</span><span style="color:#666"> / 128</span></div>
+                    <div style="text-align: right;"><span class="stat-label">Unique Spectrum</span><br><span id="unique-count" class="stat-val glow-cyan">0</span><span style="color:#666"> / <span id="total-colors-count">218</span></span></div>
                 </div>
                 <div id="inventory-grid" class="pack-grid"></div>
             </div>
         </main>
     </div>
 
+    <!-- MODALS -->
     <div id="pack-overlay" class="overlay">
         <h2 id="pack-title" class="glow-cyan" style="font-size: 2.2rem;">DECRYPTING CACHE...</h2>
         <div id="pack-cards" class="drawn-container"></div>
@@ -150,59 +157,71 @@
         </div>
     </div>
 
-    <div id="incoming-overlay" class="overlay">
-        <div class="modal" style="width: 700px;">
-            <div style="display: flex; justify-content: space-between; margin-bottom: 20px;">
-                <h2 class="glow-gold" style="color: var(--gold);">PENDING TRANSMISSIONS</h2><button onclick="closeOverlay('incoming-overlay')">X</button>
-            </div>
-            <p style="color:#888; margin-bottom: 15px;">Note: Transmissions auto-decay after 60 seconds.</p>
-            <div id="incoming-list" style="display: flex; flex-direction: column; gap: 15px;"></div>
-        </div>
-    </div>
-
+    <!-- Hub to pick who to trade with -->
     <div id="hub-overlay" class="overlay">
         <div class="modal">
             <div style="display: flex; justify-content: space-between;"><h2>ESTABLISH UPLINK</h2><button onclick="closeOverlay('hub-overlay')">X</button></div>
-            <p style="color:#888; margin: 10px 0;">Limit: 1 Request per Minute</p>
+            <p style="color:#888; margin: 10px 0;">Limit: 1 Request per Minute to avoid spam.</p>
             <div id="player-list" style="display: flex; flex-direction: column; gap: 10px; margin-top: 15px;"></div>
         </div>
     </div>
 
-    <div id="trade-overlay" class="overlay">
-        <div class="modal" style="width: 900px;">
-            <h2 id="trade-status" class="glow-cyan" style="text-align: center;">ESTABLISHING UPLINK...</h2>
+    <!-- NEW ASYNC DRAFT TRADE UI -->
+    <div id="draft-overlay" class="overlay">
+        <div class="modal" style="width: 1000px;">
+            <h2 class="glow-cyan" style="text-align: center;">DRAFT TRANSMISSION TO: <span id="draft-target-name" class="glow-pink"></span></h2>
+            <p style="text-align: center; color: #888; margin-top: 5px;">Select items by clicking them. They will receive this exact offer to accept or decline.</p>
+            
             <div class="trade-arena">
+                <!-- My Side -->
                 <div class="trade-side">
-                    <h3 class="glow-cyan">YOUR TRANSMISSION</h3>
+                    <h3 class="glow-cyan">I WILL GIVE</h3>
                     <div style="display: flex; align-items: center; gap: 10px; margin-top: 10px;">
-                        <span class="stat-label">OFFER CREDITS:</span>
-                        <input type="number" id="trade-my-cash" placeholder="0" value="0" onchange="syncMyTrade()" style="width: 120px;">
+                        <span class="stat-label">CREDITS:</span>
+                        <input type="number" id="draft-my-cash" placeholder="0" value="0" style="width: 120px;">
                     </div>
-                    <div class="trade-zone" id="trade-my-offer"></div>
-                    <div style="max-height: 150px; overflow-y: auto; border-top: 1px solid #333; margin-top: 15px; padding-top: 15px; display: flex; gap: 5px; flex-wrap: wrap;" id="trade-my-inv"></div>
+                    <h4 style="margin-top: 15px; color: #666; font-size: 0.8rem;">ATTACHED ITEMS (Click to remove):</h4>
+                    <div class="trade-zone" id="draft-my-offer"></div>
+                    <h4 style="margin-top: 15px; color: #666; font-size: 0.8rem;">MY INVENTORY (Click to attach):</h4>
+                    <div class="trade-zone" id="draft-my-inv" style="border-color: #333; max-height: 150px;"></div>
                 </div>
+
+                <!-- Their Side -->
                 <div class="trade-side" style="border-color: var(--pink);">
-                    <h3 class="glow-pink" id="trade-their-name">THEIR TRANSMISSION</h3>
-                    <div style="margin-top: 10px; padding: 10px; border: 1px solid var(--pink); border-radius: 4px;">
-                        <span class="stat-label" style="color: var(--pink);">CREDITS OFFERED:</span>
-                        <span class="stat-val" style="color: #fff; margin-left: 10px;">$<span id="trade-their-cash">0</span></span>
+                    <h3 class="glow-pink">I WANT</h3>
+                    <div style="display: flex; align-items: center; gap: 10px; margin-top: 10px;">
+                        <span class="stat-label" style="color: var(--pink);">CREDITS:</span>
+                        <input type="number" id="draft-their-cash" placeholder="0" value="0" style="width: 120px; border-color: var(--pink); color: var(--pink);">
                     </div>
-                    <div class="trade-zone" id="trade-their-offer" style="border-color: rgba(255,0,85,0.3);"></div>
-                    <h4 style="margin-top: 15px; color: #666; font-size: 0.8rem;">THEIR ASSETS:</h4>
-                    <div style="max-height: 110px; overflow-y: auto; border-top: 1px solid #333; margin-top: 5px; padding-top: 10px; display: flex; gap: 5px; flex-wrap: wrap;" id="trade-their-inv"></div>
+                    <h4 style="margin-top: 15px; color: #666; font-size: 0.8rem;">REQUESTED ITEMS (Click to remove):</h4>
+                    <div class="trade-zone" id="draft-their-offer" style="border-color: rgba(255,0,85,0.3);"></div>
+                    <h4 style="margin-top: 15px; color: #666; font-size: 0.8rem;">THEIR ASSETS (Click to request):</h4>
+                    <div class="trade-zone" id="draft-their-inv" style="border-color: #333; max-height: 150px;"></div>
                 </div>
             </div>
             <div style="display: flex; justify-content: space-between; margin-top: 20px;">
-                <button onclick="cancelTrade()" style="border-color: var(--alert); color: var(--alert);">ABORT</button>
-                <button onclick="lockTrade()" id="btn-lock-trade" class="btn-pink">LOCK IN OFFER</button>
+                <button onclick="closeOverlay('draft-overlay')" style="border-color: var(--alert); color: var(--alert);">CANCEL DRAFT</button>
+                <button onclick="sendDraftOffer()" class="btn-pink" style="padding: 15px 40px; font-size: 1.3rem;">SEND TRANSMISSION</button>
             </div>
         </div>
     </div>
 
+    <!-- Incoming Trades Mailbox -->
+    <div id="incoming-overlay" class="overlay">
+        <div class="modal" style="width: 800px;">
+            <div style="display: flex; justify-content: space-between; margin-bottom: 20px;">
+                <h2 class="glow-gold" style="color: var(--gold);">INBOX (PENDING TRANSMISSIONS)</h2><button onclick="closeOverlay('incoming-overlay')">X</button>
+            </div>
+            <p style="color:#888; margin-bottom: 15px;">Transmissions auto-decay after 60 seconds.</p>
+            <div id="incoming-list" style="display: flex; flex-direction: column; gap: 15px;"></div>
+        </div>
+    </div>
+
+    <!-- Global Dex -->
     <div id="dex-overlay" class="overlay">
         <div class="modal" style="width: 95%;">
             <div style="display: flex; justify-content: space-between; margin-bottom: 15px;"><h2 class="glow-cyan">GLOBAL DEX</h2><button onclick="closeOverlay('dex-overlay')">X</button></div>
-            <p id="dex-info" style="font-size: 1.4rem; margin-bottom: 15px; color: var(--gold); min-height: 25px;">UNIQUE SPECTRUM OWNED: <span id="dex-owned-text">0/128</span></p>
+            <p id="dex-info" style="font-size: 1.4rem; margin-bottom: 15px; color: var(--gold); min-height: 25px;">UNIQUE SPECTRUM OWNED: <span id="dex-owned-text">0/218</span></p>
             <p id="dex-hover-info" style="min-height: 20px; color:#888; margin-bottom: 10px;">Select a spectrum coordinate to locate.</p>
             <div id="global-dex-grid" style="display: grid; grid-template-columns: repeat(auto-fill, minmax(35px, 1fr)); gap: 2px; background: #000; padding: 2px;"></div>
         </div>
@@ -214,7 +233,6 @@
         // ==========================================
         // PASTE YOUR REAL CONFIG OBJECT HERE:
         // Import the functions you need from the SDKs you need
-
         const firebaseConfig = {
             apiKey: "AIzaSyAActFtDrgVBq8wAOujPzETSDaU3nhtjhU",
             authDomain: "packian.firebaseapp.com",
@@ -225,12 +243,12 @@
             measurementId: "G-L89L3WDE18"
         };
 
-
+// Initialize Firebase
         if (!firebase.apps.length) firebase.initializeApp(firebaseConfig);
         const db = firebase.firestore();
 
         // ==========================================
-        // 2. DATA ARCHITECTURE
+        // 2. DATA ARCHITECTURE (18 STD + 18 EVENT + 2 EXC = 218 Colors)
         // ==========================================
         let cId = 1; const ALL_COLORS = new Map(); const POOL = { std: [], ev: [], exc: [], free: [], high: [] };
         const PACK_PRICES = [50, 150, 350, 750, 1400, 2400, 3800, 5800, 8500, 12000, 16500, 22500, 30000, 40000, 52000, 68000, 88000, 180000];
@@ -274,13 +292,22 @@
             return { id: `P${i}`, name: p.n + " Pack", cost: PACK_PRICES[i], colors: colors, type: 'std' };
         });
 
-        const EV_RAW = [{ n: "Neon Anomaly", data: [["Neon Pink","#FF10F0"], ["Neon Green","#39FF14"], ["Neon Blue","#04D9FF"], ["Neon Yellow","#DFFF00"], ["Neon Orange","#FF5F1F"], ["Neon Purple","#B026FF"]] }, { n: "Pastel Dream", data: [["Baby Blue","#89CFF0"], ["Mint Cream","#F5FFFA"], ["Peach Puff","#FFDAB9"], ["Lavender Blush","#FFF0F5"], ["Misty Rose","#FFE4E1"], ["Honeydew","#F0FFF0"]] }, { n: "Metallic Core", data: [["Copper","#B87333"], ["Bronze","#CD7F32"], ["Brass","#B5A642"], ["Platinum","#E5E4E2"], ["Steel","#434B4D"], ["Rose Gold","#B76E79"]] }];
-        const EV_PACKS = EV_RAW.map((p, i) => {
-            let colors = p.data.map((c,j) => { let inst = { id: `C${cId++}`, name: c[0], hex: c[1], val: Math.floor(50000 * Math.pow(1.3, j) + cId*13) }; POOL.ev.push(inst); ALL_COLORS.set(inst.id, inst); POOL.high.push(inst); return inst; });
-            return { id: `E${i}`, name: p.n, cost: 250000, colors: colors, isEvent: true };
+        // Generate 18 Unique Event Packs for Anomalies
+        const EV_NAMES = ["Neon Anomaly", "Pastel Dream", "Metallic Core", "Radiant Void", "Solar Flare", "Abyssal Trench", "Toxic Spill", "Glacial Freeze", "Ethereal Mist", "Volcanic Ash", "Crystal Shard", "Prismatic Light", "Dark Matter", "Plasma Burst", "Cosmic Dust", "Nebula Swirl", "Quantum Flux", "Supernova"];
+        const EV_PACKS = EV_NAMES.map((n, i) => {
+            let colors = [];
+            for(let j=0; j<6; j++) {
+                let hue = Math.floor(Math.random() * 360);
+                let inst = { id: `C${cId++}`, name: `${n} Tier ${j+1}`, hex: `hsl(${hue}, 100%, 60%)`, val: Math.floor(50000 * Math.pow(1.3, j) + cId*13) };
+                POOL.ev.push(inst); ALL_COLORS.set(inst.id, inst); POOL.high.push(inst); colors.push(inst);
+            }
+            return { id: `E${i}`, name: n, cost: 250000, colors: colors, isEvent: true };
         });
+
         const exc1 = { id: `C${cId++}`, name: "Titanium White", hex: "#FFFFFF", val: 1250000 }; const exc2 = { id: `C${cId++}`, name: "Vantablack", hex: "#000000", val: 1500000 };
         POOL.exc.push(exc1, exc2); ALL_COLORS.set(exc1.id, exc1); ALL_COLORS.set(exc2.id, exc2); POOL.high.push(exc1, exc2);
+        
+        const TOTAL_COLORS = ALL_COLORS.size; // Should be 218
 
         // ==========================================
         // 3. SYNTH AUDIO & NOTIFICATIONS
@@ -296,48 +323,39 @@
         };
 
         function notifyCenter(msg, btnText, btnAction) {
-            sfx.alert();
-            const b = document.getElementById('notification-hub'); const t = document.createElement('div'); t.className = 'toast';
+            let hub = document.getElementById('notification-hub'); if(!hub) return; sfx.alert();
+            const t = document.createElement('div'); t.className = 'toast';
             t.innerHTML = `<span>${msg}</span> <button class="btn-pink" style="padding:6px 15px; font-size:1rem;">${btnText}</button>`;
-            b.appendChild(t);
+            hub.appendChild(t);
             t.querySelector('button').onclick = () => { t.remove(); if(btnAction) btnAction(); };
             setTimeout(() => { if(t.parentElement) t.remove(); }, 8000);
         }
 
         // ==========================================
-        // 4. GAME STATE & ERROR HANDLING
+        // 4. GAME STATE & CORE LOGIC
         // ==========================================
-        let state = { name: "", code: null, isHost: false, status: 'setup', cash: 50, inv: [], dex: new Set(), endTime: 0, nextEv: 0, evActive: false, players: {}, freeReady: true };
-        let subs = []; let loop; let tId = null; let myOffer = { cash: 0, cols: [] };
+        let state = { name: "", code: null, isHost: false, status: 'setup', cash: 50, inv: [], dex: new Set(), endTime: 0, nextEv: 0, localAnomalies: [], evActive: false, players: {}, freeReady: true };
+        let subs = []; let loop; 
         let pendingTradesCache = {}; let lastTradeSent = 0; let anomalyLock = false;
 
-        function showScreen(id) { document.querySelectorAll('.screen').forEach(s => s.classList.remove('active')); document.getElementById(id).classList.add('active'); sfx.click(); }
-        function closeOverlay(id) { document.getElementById(id).style.display = 'none'; sfx.click(); }
+        function showScreen(id) { document.querySelectorAll('.screen').forEach(s => s.classList.remove('active')); let el = document.getElementById(id); if(el) el.classList.add('active'); sfx.click(); }
+        function closeOverlay(id) { let el = document.getElementById(id); if(el) el.style.display = 'none'; sfx.click(); }
 
         async function hostGame() {
             try {
-                const name = document.getElementById('playerName').value.trim().toUpperCase();
-                if(!name) return notifyCenter("ALIAS REQUIRED", "DISMISS");
-                const code = Math.random().toString(36).substr(2,6).toUpperCase();
-                state.name = name; state.code = code; state.isHost = true;
-                await db.collection('games').doc(code).set({ host: name, status: 'lobby' });
-                joinLobby(code, name);
-            } catch(e) {
-                console.error(e); notifyCenter("DATABASE ERROR: Check Firestore Rules", "DISMISS");
-            }
+                const name = document.getElementById('playerName').value.trim().toUpperCase(); if(!name) return notifyCenter("ALIAS REQUIRED", "DISMISS");
+                const code = Math.random().toString(36).substr(2,6).toUpperCase(); state.name = name; state.code = code; state.isHost = true;
+                await db.collection('games').doc(code).set({ host: name, status: 'lobby' }); joinLobby(code, name);
+            } catch(e) { notifyCenter("DATABASE ERROR: Check Firestore Rules", "DISMISS"); }
         }
 
         async function joinGame() {
             try {
-                const name = document.getElementById('playerName').value.trim().toUpperCase();
-                const code = document.getElementById('partyCodeInput').value.trim().toUpperCase();
-                if(!name || !code) { notifyCenter("DATA MISSING: Enter Alias & Code", "DISMISS"); return; }
-                const doc = await db.collection('games').doc(code).get();
-                if(!doc.exists || doc.data().status === 'ended') return notifyCenter("NODE INVALID OR OFFLINE", "DISMISS");
+                const name = document.getElementById('playerName').value.trim().toUpperCase(); const code = document.getElementById('partyCodeInput').value.trim().toUpperCase();
+                if(!name || !code) return notifyCenter("DATA MISSING", "DISMISS");
+                const doc = await db.collection('games').doc(code).get(); if(!doc.exists || doc.data().status === 'ended') return notifyCenter("NODE INVALID", "DISMISS");
                 joinLobby(code, name);
-            } catch(e) {
-                console.error(e); notifyCenter("DATABASE ERROR: Check Firestore Rules", "DISMISS");
-            }
+            } catch(e) { notifyCenter("DATABASE ERROR: Check Firestore Rules", "DISMISS"); }
         }
 
         function joinLobby(code, name) {
@@ -345,14 +363,12 @@
             db.collection('games').doc(code).collection('players').doc(name).set({ cash: state.cash, invSize: 0, lastAcq: Date.now(), items: [], isBot: false });
 
             subs.push(db.collection('games').doc(code).onSnapshot(s => {
-                let d = s.data(); 
-                if(!s.exists || !d || d.status === 'ended') { endGame(); return; }
-
+                let d = s.data(); if(!s.exists || !d || d.status === 'ended') { endGame(); return; }
                 if(d.status === 'lobby') {
-                    showScreen('lobby-screen'); document.getElementById('lobby-code-display').innerText = code;
+                    showScreen('lobby-screen'); let lcd = document.getElementById('lobby-code-display'); if(lcd) lcd.innerText = code;
                     if(state.isHost) { document.getElementById('btn-add-bot').style.display = 'block'; document.getElementById('btn-start-game').style.display = 'block'; }
                 } else if(d.status === 'active' && state.status !== 'active') {
-                    state.status = 'active'; state.endTime = d.end; state.nextEv = d.nextEv;
+                    state.status = 'active'; state.endTime = d.end; state.nextEv = d.nextEv; document.getElementById('total-colors-count').innerText = TOTAL_COLORS;
                     showScreen('game-screen'); document.getElementById('hud-party').innerText = code;
                     renderStore(); loop = setInterval(gameLoop, 1000);
                 }
@@ -361,13 +377,12 @@
 
             subs.push(db.collection('games').doc(code).collection('players').onSnapshot(s => { 
                 s.docs.forEach(d => state.players[d.id] = d.data()); 
-                if(state.status === 'lobby' || state.status === 'setup') {
-                    document.getElementById('lobby-players').innerHTML = Object.keys(state.players).map(p => `<div>> ${p} ${state.players[p].isBot ? '[AI]' : ''}</div>`).join('');
-                }
+                if(state.status === 'lobby' || state.status === 'setup') { let lp = document.getElementById('lobby-players'); if(lp) lp.innerHTML = Object.keys(state.players).map(p => `<div>> ${p} ${state.players[p].isBot ? '[AI]' : ''}</div>`).join(''); }
             }));
             
             subs.push(db.collection('games').doc(code).collection('events').onSnapshot(s => { s.docChanges().forEach(c => { if(c.type==='added' && Date.now() - c.doc.data().ts < 5000) triggerGlobalEvent(c.doc.data()); }); }));
             
+            // Listen for Incoming Mailbox Trades
             subs.push(db.collection('games').doc(code).collection('trades').where('p2', '==', name).where('status', '==', 'pending').onSnapshot(s => { 
                 s.docChanges().forEach(c => { 
                     if(c.type==='added') { pendingTradesCache[c.doc.id] = c.doc.data(); notifyCenter(`INCOMING UPLINK FROM ${c.doc.data().p1}`, "VIEW", openIncomingTrades); updateTradeBadge(); }
@@ -375,29 +390,26 @@
                 }); 
             }));
 
-            subs.push(db.collection('games').doc(code).collection('trades').onSnapshot(s => { s.docs.forEach(d => { if(d.id === tId) renderActiveTrade(d.data()); }); }));
-
+            // Auto-cancel 60s
             setInterval(() => {
                 let now = Date.now();
                 Object.keys(pendingTradesCache).forEach(id => {
-                    if(now - pendingTradesCache[id].ts > 60000) { db.collection('games').doc(state.code).collection('trades').doc(id).update({status: 'cancelled'}); delete pendingTradesCache[id]; updateTradeBadge(); }
+                    if(now - pendingTradesCache[id].ts > 60000) { if(state.code) db.collection('games').doc(state.code).collection('trades').doc(id).update({status: 'cancelled'}); delete pendingTradesCache[id]; updateTradeBadge(); }
                 });
             }, 5000);
             
             setInterval(() => { if(state.status === 'active' && Math.random() > 0.65) triggerPersonalEvent(); }, 40000);
-
-            window.addEventListener('beforeunload', () => { if(state.isHost) db.collection('games').doc(code).delete(); });
+            window.addEventListener('beforeunload', () => { if(state.isHost && state.code) db.collection('games').doc(state.code).delete(); });
         }
 
         function addBot() {
-            if(!state.code) return; // Prevent empty path error if host fails
-            let bName = "BOT_" + Math.random().toString(36).substr(2,4).toUpperCase(); let bItems = [];
+            if(!state.code) return; let bName = "BOT_" + Math.random().toString(36).substr(2,4).toUpperCase(); let bItems = [];
             for(let i=0; i<10; i++) bItems.push(POOL.std[Math.floor(Math.random()*POOL.std.length)].id);
             db.collection('games').doc(state.code).collection('players').doc(bName).set({ cash: 15000, invSize: 10, items: bItems, isBot: true });
         }
 
         function startGame() {
-            let now = Date.now(); let end = now + (parseInt(document.getElementById('gameDuration').value)*60000); let next = now + (parseInt(document.getElementById('eventFreq').value)*60000);
+            if(!state.code) return; let now = Date.now(); let end = now + (parseInt(document.getElementById('gameDuration').value)*60000); let next = now + (parseInt(document.getElementById('eventFreq').value)*60000);
             db.collection('games').doc(state.code).update({ status: 'active', end: end, nextEv: next });
         }
 
@@ -406,23 +418,22 @@
             const f = (ms) => { let s = Math.floor(ms/1000); return `${String(Math.floor(s/60)).padStart(2,'0')}:${String(s%60).padStart(2,'0')}`; };
             document.getElementById('hud-time').innerText = f(left); document.getElementById('hud-event').innerText = f(ev);
             
-            if(left===0 && state.isHost) db.collection('games').doc(state.code).update({status: 'ended'});
+            if(left===0 && state.isHost && state.code) db.collection('games').doc(state.code).update({status: 'ended'});
             
-            if(ev <= 0 && state.isHost && left > 0 && !anomalyLock) {
+            if(ev <= 0 && state.isHost && left > 0 && !anomalyLock && state.code) {
                 anomalyLock = true; let fq = parseInt(document.getElementById('eventFreq').value)*60000;
                 db.collection('games').doc(state.code).update({ nextEv: Date.now() + fq });
-                db.collection('games').doc(state.code).collection('events').add({ type: Math.random()>0.3?"PACK":"DROP", ts: Date.now() });
+                db.collection('games').doc(state.code).collection('events').add({ type: "ANOMALY", ts: Date.now() });
                 setTimeout(() => { anomalyLock = false; }, 3000);
             }
-
             if(state.isHost && left > 0 && Math.random() < 0.1) executeBotAI();
         }
 
         // ==========================================
-        // 5. PACKS & INVENTORY
+        // 5. STORE & INVENTORY
         // ==========================================
         function renderStore() {
-            const g = document.getElementById('store-grid'); g.innerHTML = '';
+            const g = document.getElementById('store-grid'); if(!g) return; g.innerHTML = '';
             
             const btnFree = document.createElement('div'); btnFree.className = 'item-card'; btnFree.style.borderColor = '#888';
             btnFree.innerHTML = `<h4 style="color:#fff; font-size:1rem;">INITIATE CACHE</h4><p class="stat-val" style="color:#aaa;">FREE</p><button style="margin-top:10px; width:100%; border-color:#888; color:#888;">PULL</button>`;
@@ -434,7 +445,7 @@
             if(!state.freeReady) { btnFree.querySelector('button').innerText = "WAIT"; btnFree.querySelector('button').disabled = true; }
             g.appendChild(btnFree);
 
-            let packs = state.evActive ? [...STD_PACKS, ...EV_PACKS] : STD_PACKS;
+            let packs = state.evActive ? [...STD_PACKS, ...state.localAnomalies] : STD_PACKS;
             packs.forEach(p => {
                 const c = document.createElement('div'); c.className = 'item-card'; if(p.isEvent) c.style.borderColor = "var(--pink)";
                 c.innerHTML = `<h4 style="color:${p.isEvent?'var(--pink)':'var(--cyan)'}; font-size:1rem;">${p.name}</h4><p class="stat-val">$${p.cost.toLocaleString()}</p><button style="margin-top:10px; width:100%;" class="${p.isEvent?'btn-pink':''}">PULL</button>`;
@@ -450,17 +461,14 @@
 
         function processWeightedDraw(pool) {
             const o = document.getElementById('pack-overlay'), c = document.getElementById('pack-cards'), b = document.getElementById('btn-pack-close');
-            o.style.display = 'flex'; c.innerHTML = ''; b.style.display = 'none'; document.getElementById('pack-title').innerText = "DECRYPTING CACHE...";
+            if(!o || !c || !b) return; o.style.display = 'flex'; c.innerHTML = ''; b.style.display = 'none'; document.getElementById('pack-title').innerText = "DECRYPTING CACHE...";
             let drawn = [];
             for(let i=0; i<6; i++) {
                 let tw = 0; let weights = pool.map(col => { let w = 10000000 / col.val; tw += w; return w; });
                 let r = Math.random() * tw, cum = 0, picked = pool[pool.length-1];
                 for(let j=0; j<pool.length; j++) { cum += weights[j]; if(r <= cum) { picked = pool[j]; break; } }
                 
-                let tier = getTierInfo(picked.val);
-                let inst = { uId: Math.random().toString(36).substr(2,9), id: picked.id, name: picked.name, hex: picked.hex, rarity: tier.r, val: picked.val, x: tier.x };
-                drawn.push(inst);
-
+                let tier = getTierInfo(picked.val); let inst = { uId: Math.random().toString(36).substr(2,9), id: picked.id, name: picked.name, hex: picked.hex, rarity: tier.r, val: picked.val, x: tier.x }; drawn.push(inst);
                 const card = document.createElement('div'); card.className = 'card-3d';
                 card.innerHTML = `<div class="card-face card-back"></div><div class="card-face card-front" style="border-color:${inst.x}; justify-content:space-between;"><div class="swatch" style="background:${inst.hex};"></div><p style="font-size:0.6rem; color:${inst.x}">${inst.rarity}</p><p style="font-size:0.75rem; font-weight:bold; margin-top:5px;">$${inst.val.toLocaleString()}</p></div>`;
                 c.appendChild(card); setTimeout(() => { sfx.reveal(300+(i*100)); card.classList.add('revealed'); }, i*400 + 200);
@@ -472,12 +480,12 @@
 
         function syncInv() {
             state.dex.clear(); state.inv.forEach(i => state.dex.add(i.id));
-            document.getElementById('unique-count').innerText = state.dex.size;
-            document.getElementById('dex-owned-text').innerText = `${state.dex.size}/128`;
+            let uc = document.getElementById('unique-count'); if(uc) uc.innerText = state.dex.size;
+            let doxt = document.getElementById('dex-owned-text'); if(doxt) doxt.innerText = `${state.dex.size}/${TOTAL_COLORS}`;
             syncDB();
-            if(state.dex.size >= 128 && state.isHost) db.collection('games').doc(state.code).update({status: 'ended'});
+            if(state.dex.size >= TOTAL_COLORS && state.isHost && state.code) db.collection('games').doc(state.code).update({status: 'ended'});
             
-            const g = document.getElementById('inventory-grid'); g.innerHTML = '';
+            const g = document.getElementById('inventory-grid'); if(!g) return; g.innerHTML = '';
             state.inv.forEach((item, idx) => {
                 const c = document.createElement('div'); c.className = 'item-card'; c.style.borderColor = item.x;
                 c.innerHTML = `<div class="swatch" style="background:${item.hex};"></div><p style="font-size:0.65rem;">${item.name}</p><button style="font-size:0.65rem; padding:6px; margin-top:8px; width:100%; border-color:#555;" onclick="sellColor(${idx}, event)">SELL $${item.val.toLocaleString()}</button>`;
@@ -486,141 +494,172 @@
         }
 
         function sellColor(idx, e) { e.stopPropagation(); let c = state.inv[idx]; sfx.sell(); updateCash(c.val); state.inv.splice(idx,1); syncInv(); }
-        function syncDB() { db.collection('games').doc(state.code).collection('players').doc(state.name).update({ cash: state.cash, invSize: state.dex.size, lastAcq: Date.now(), items: Array.from(state.dex) }); }
+        function syncDB() { if(state.code) db.collection('games').doc(state.code).collection('players').doc(state.name).update({ cash: state.cash, invSize: state.dex.size, lastAcq: Date.now(), items: Array.from(state.dex) }); }
 
         // ==========================================
-        // 6. TRADING & BOT DIVERSITY
+        // 6. ASYNC MAILBOX TRADING (NEW)
         // ==========================================
-        function updateTradeBadge() {
-            const count = Object.keys(pendingTradesCache).length; const badge = document.getElementById('trade-badge');
-            if(count > 0) { badge.style.display = 'block'; badge.innerText = count; } else { badge.style.display = 'none'; }
+        let draftTarget = ""; let draftOffer = { cash: 0, cols: [] }; let draftRequest = { cash: 0, cols: [] };
+
+        function updateTradeBadge() { const count = Object.keys(pendingTradesCache).length; const badge = document.getElementById('trade-badge'); if(badge) { if(count > 0) { badge.style.display = 'block'; badge.innerText = count; } else { badge.style.display = 'none'; } } }
+
+        function openTradeHub() {
+            let overlay = document.getElementById('hub-overlay'); if(!overlay) return; overlay.style.display = 'flex'; sfx.click(); const list = document.getElementById('player-list'); list.innerHTML = '';
+            Object.keys(state.players).forEach(p => {
+                if(p === state.name || state.players[p].isBot) return; 
+                let btn = document.createElement('div'); btn.className = 'glass'; btn.style = "display:flex; justify-content:space-between; align-items:center; background: rgba(0,240,255,0.05);";
+                btn.innerHTML = `<span style="font-size:1.1rem;"><b>${p}</b> <span style="color:#888;">(${state.players[p].invSize} Uniques)</span></span> <button onclick="openDraftTrade('${p}')">DRAFT UPLINK</button>`;
+                list.appendChild(btn);
+            });
+        }
+
+        function openDraftTrade(targetName) {
+            if(Date.now() - lastTradeSent < 60000) return notifyCenter("UPLINK COOLING DOWN (1 Min Wait)", "ACKNOWLEDGE");
+            closeOverlay('hub-overlay'); draftTarget = targetName; draftOffer = {cash:0, cols:[]}; draftRequest = {cash:0, cols:[]};
+            document.getElementById('draft-target-name').innerText = targetName;
+            document.getElementById('draft-my-cash').value = 0; document.getElementById('draft-their-cash').value = 0;
+            document.getElementById('draft-overlay').style.display = 'flex'; sfx.click(); renderDraftUI();
+        }
+
+        function renderDraftUI() {
+            // Render My Attached Offer
+            document.getElementById('draft-my-offer').innerHTML = draftOffer.cols.map((c,i) => `<div class="trade-item-row" style="border-color:${c.x}" onclick="removeDraftOffer(${i})"><span style="color:${c.x}">[${c.r}] ${c.name}</span> <span>$${c.val.toLocaleString()}</span></div>`).join('');
+            // Render My Inventory (to pick from)
+            document.getElementById('draft-my-inv').innerHTML = state.inv.map((c,i) => `<div class="trade-item-row" style="border-color:${c.x}" onclick="addDraftOffer(${i})"><span style="color:${c.x}">[${c.r}] ${c.name}</span> <span>$${c.val.toLocaleString()}</span></div>`).join('');
+            
+            // Render Requested Items
+            document.getElementById('draft-their-offer').innerHTML = draftRequest.cols.map((c,i) => `<div class="trade-item-row" style="border-color:${c.x}" onclick="removeDraftRequest(${i})"><span style="color:${c.x}">[${c.r}] ${c.name}</span> <span>$${c.val.toLocaleString()}</span></div>`).join('');
+            // Render Their Assets
+            let theirData = state.players[draftTarget];
+            if (theirData && theirData.items) {
+                document.getElementById('draft-their-inv').innerHTML = theirData.items.map((id, i) => {
+                    let c = ALL_COLORS.get(id); 
+                    if(!c) return '';
+                    let tier = getTierInfo(c.val);
+                    return `<div class="trade-item-row" style="border-color:${tier.x}" onclick="addDraftRequest('${c.id}')"><span style="color:${tier.x}">[${tier.r}] ${c.name}</span> <span>$${c.val.toLocaleString()}</span></div>`;
+                }).join('');
+            }
+        }
+
+        function addDraftOffer(i) { let c = state.inv[i]; if(!draftOffer.cols.find(x => x.uId === c.uId)) { draftOffer.cols.push(c); sfx.click(); renderDraftUI(); } }
+        function removeDraftOffer(i) { draftOffer.cols.splice(i,1); sfx.click(); renderDraftUI(); }
+        function addDraftRequest(id) { let c = ALL_COLORS.get(id); if(c && !draftRequest.cols.find(x => x.id === c.id)) { let tier = getTierInfo(c.val); draftRequest.cols.push({ id: c.id, name: c.name, hex: c.hex, val: c.val, r: tier.r, x: tier.x }); sfx.click(); renderDraftUI(); } }
+        function removeDraftRequest(i) { draftRequest.cols.splice(i,1); sfx.click(); renderDraftUI(); }
+
+        function sendDraftOffer() {
+            draftOffer.cash = parseInt(document.getElementById('draft-my-cash').value) || 0;
+            if(draftOffer.cash > state.cash) { notifyCenter("INSUFFICIENT CREDITS FOR DRAFT", "DISMISS"); return; }
+            draftRequest.cash = parseInt(document.getElementById('draft-their-cash').value) || 0;
+            
+            lastTradeSent = Date.now(); closeOverlay('draft-overlay'); notifyCenter(`Uplink transmission sent to ${draftTarget}`, "OK");
+            if(state.code) db.collection('games').doc(state.code).collection('trades').add({ p1: state.name, p2: draftTarget, status: 'pending', type: 'async', ts: Date.now(), o1: draftOffer, o2: draftRequest });
         }
 
         function openIncomingTrades() {
-            document.getElementById('incoming-overlay').style.display = 'flex'; sfx.click();
+            let ov = document.getElementById('incoming-overlay'); if(!ov) return; ov.style.display = 'flex'; sfx.click();
             const list = document.getElementById('incoming-list'); list.innerHTML = '';
             let keys = Object.keys(pendingTradesCache);
             if(keys.length === 0) return list.innerHTML = "<p style='color:#888;'>No pending transmissions.</p>";
             
             keys.forEach(id => {
                 let d = pendingTradesCache[id]; let el = document.createElement('div'); el.className = 'glass';
-                if(d.type === 'p2p') {
-                    el.innerHTML = `<h3>P2P NEGOTIATION: ${d.p1}</h3><p style="margin:10px 0;">Operative ${d.p1} wants to establish a manual trade uplink.</p><button onclick="acceptP2P('${id}')">OPEN INTERFACE</button>`;
-                } else if(d.type === 'firm') {
-                    let offCols = d.o1.cols.map(c=>c.name).join(', ') || 'None'; let reqCols = d.o2.cols.map(c=>c.name).join(', ') || 'None';
-                    el.innerHTML = `<h3>FIRM OFFER FROM [${d.p1}]</h3><div style="margin:10px 0; background:rgba(0,0,0,0.5); padding:10px;"><p style="color:var(--cyan)">THEY OFFER: $${d.o1.cash.toLocaleString()} & [${offCols}]</p><p style="color:var(--pink); margin-top:5px;">THEY REQUEST: $${d.o2.cash.toLocaleString()} & [${reqCols}]</p></div><div style="display:flex; gap:10px;"><button class="btn-pink" onclick="executeFirmTrade('${id}')">ACCEPT SWAP</button><button onclick="cancelTradeDoc('${id}')" style="border-color:#555; color:#555;">DECLINE</button></div>`;
-                }
+                let offCols = d.o1.cols.map(c=>`<span style="color:${c.x||'#fff'}">${c.name} ($${c.val})</span>`).join(', ') || 'None'; 
+                let reqCols = d.o2.cols.map(c=>`<span style="color:${c.x||'#fff'}">${c.name} ($${c.val})</span>`).join(', ') || 'None';
+                
+                el.innerHTML = `<h3>OFFER FROM: [${d.p1}]</h3>
+                <div style="margin:10px 0; background:rgba(0,0,0,0.5); padding:10px; border-left: 3px solid var(--cyan);">
+                    <p style="color:var(--cyan); font-weight:bold;">THEY GIVE YOU:</p><p>$${d.o1.cash.toLocaleString()} CREDITS & ${offCols}</p>
+                </div>
+                <div style="margin:10px 0; background:rgba(0,0,0,0.5); padding:10px; border-left: 3px solid var(--pink);">
+                    <p style="color:var(--pink); font-weight:bold;">THEY WANT FROM YOU:</p><p>$${d.o2.cash.toLocaleString()} CREDITS & ${reqCols}</p>
+                </div>
+                <div style="display:flex; gap:10px;"><button class="btn-pink" onclick="acceptAsyncTrade('${id}')">ACCEPT & SWAP</button><button onclick="cancelTradeDoc('${id}')" style="border-color:#555; color:#555;">DECLINE</button></div>`;
                 list.appendChild(el);
             });
         }
 
-        function acceptP2P(id) { closeOverlay('incoming-overlay'); tId = id; myOffer = {cash:0, cols:[]}; db.collection('games').doc(state.code).collection('trades').doc(id).update({status: 'active'}); document.getElementById('trade-overlay').style.display = 'flex'; }
-        function executeFirmTrade(id) {
-            let t = pendingTradesCache[id]; if(!t) return; let hasCols = t.o2.cols.every(req => state.inv.some(ic => ic.id === req.id));
-            if(!hasCols || state.cash < t.o2.cash) { db.collection('games').doc(state.code).collection('trades').doc(id).update({status: 'cancelled'}); notifyCenter("INSUFFICIENT ASSETS TO ACCEPT", "DISMISS"); openIncomingTrades(); return; }
-            db.collection('games').doc(state.code).collection('trades').doc(id).update({status: 'completed'}); applySwap(t.o2, t.o1, true); closeOverlay('incoming-overlay');
-        }
-
-        function cancelTradeDoc(id) { db.collection('games').doc(state.code).collection('trades').doc(id).update({status: 'cancelled'}); }
-        function cancelTrade() { if(tId) cancelTradeDoc(tId); }
-
-        function openTradeHub() {
-            document.getElementById('hub-overlay').style.display = 'flex'; sfx.click(); const list = document.getElementById('player-list'); list.innerHTML = '';
-            Object.keys(state.players).forEach(p => {
-                if(p === state.name || state.players[p].isBot) return; 
-                let btn = document.createElement('div'); btn.className = 'glass'; btn.style = "display:flex; justify-content:space-between; align-items:center; background: rgba(0,240,255,0.05);";
-                btn.innerHTML = `<span style="font-size:1.1rem;"><b>${p}</b> <span style="color:#888;">(${state.players[p].invSize} Uniques)</span></span> <button onclick="initTrade('${p}')">REQUEST UPLINK</button>`;
-                list.appendChild(btn);
-            });
-        }
-
-        async function initTrade(target) {
-            if(Date.now() - lastTradeSent < 60000) return notifyCenter("UPLINK COOLING DOWN (1 Min Wait)", "ACKNOWLEDGE");
-            lastTradeSent = Date.now(); closeOverlay('hub-overlay'); notifyCenter(`Uplink request sent to ${target}`, "OK");
-            const ref = await db.collection('games').doc(state.code).collection('trades').add({ p1: state.name, p2: target, status: 'pending', type: 'p2p', ts: Date.now(), o1: {cash:0, cols:[]}, o2: {cash:0, cols:[]}, locked1: false, locked2: false });
-            tId = ref.id; document.getElementById('trade-overlay').style.display = 'flex'; myOffer = {cash:0, cols:[]};
-        }
-        
-        function renderActiveTrade(data) {
-            if(!tId) return;
-            if(data.status === 'rejected' || data.status === 'completed' || data.status === 'cancelled') { closeOverlay('trade-overlay'); tId = null; notifyCenter(`TRADE ${data.status.toUpperCase()}`, "DISMISS"); return; }
+        function acceptAsyncTrade(id) {
+            let t = pendingTradesCache[id]; if(!t || !state.code) return; 
             
-            const isP1 = data.p1 === state.name; const myO = isP1 ? data.o1 : data.o2; const theirO = isP1 ? data.o2 : data.o1;
-            let theirName = isP1 ? data.p2 : data.p1;
+            // Verify I have the required cash and items
+            if(state.cash < t.o2.cash) return notifyCenter("INSUFFICIENT CREDITS TO ACCEPT", "DISMISS");
+            let hasCols = t.o2.cols.every(req => state.inv.some(ic => ic.id === req.id));
+            if(!hasCols) return notifyCenter("MISSING REQUESTED COLORS", "DISMISS");
+
+            // Verify They have the offered cash and items (Receiver acts as server)
+            let them = state.players[t.p1]; if(!them) return;
+            if(them.cash < t.o1.cash) return notifyCenter(`OPERATIVE ${t.p1} LACKS CREDITS`, "DISMISS");
+            let theyHaveCols = t.o1.cols.every(off => them.items.includes(off.id));
+            if(!theyHaveCols) return notifyCenter(`OPERATIVE ${t.p1} NO LONGER HAS ASSETS`, "DISMISS");
+
+            // Process Transaction: Receiver does the DB work for both to avoid async desyncs
+            db.collection('games').doc(state.code).collection('trades').doc(id).update({status: 'completed'});
+            closeOverlay('incoming-overlay');
+
+            // 1. Update Me
+            updateCash(t.o1.cash - t.o2.cash);
+            t.o2.cols.forEach(req => { let idx = state.inv.findIndex(i => i.id === req.id); if(idx > -1) state.inv.splice(idx, 1); }); // remove mine
+            t.o1.cols.forEach(off => { state.inv.push({ uId: Math.random().toString(36).substr(2,9), id: off.id, name: off.name, hex: off.hex, rarity: off.r || getTierInfo(off.val).r, val: off.val, x: off.x || getTierInfo(off.val).x }); });
+            syncInv();
+
+            // 2. Update Them in DB directly
+            let newThemCash = them.cash - t.o1.cash + t.o2.cash;
+            let newThemItems = [...them.items];
+            t.o1.cols.forEach(off => { let idx = newThemItems.indexOf(off.id); if(idx > -1) newThemItems.splice(idx, 1); });
+            t.o2.cols.forEach(req => { newThemItems.push(req.id); });
             
-            document.getElementById('trade-status').innerText = (data.locked1 && data.locked2) ? "EXECUTING PROTOCOL..." : "NEGOTIATING...";
-            document.getElementById('trade-their-name').innerText = theirName;
-            document.getElementById('trade-their-cash').innerText = theirO.cash.toLocaleString();
-            
-            document.getElementById('trade-their-offer').innerHTML = theirO.cols.map(c => `<div class="mini-color" style="background:${c.hex}; border-color:${c.x}" title="${c.name}"></div>`).join('');
-            document.getElementById('trade-my-offer').innerHTML = myOffer.cols.map((c,i) => `<div class="mini-color" style="background:${c.hex}; border-color:${c.x}" onclick="removeTradeItem(${i})"></div>`).join('');
-            document.getElementById('trade-my-inv').innerHTML = state.inv.map((c,i) => `<div class="mini-color" style="background:${c.hex}; border-color:${c.x}" onclick="addTradeItem(${i})"></div>`).join('');
-
-            let theirData = state.players[theirName];
-            if (theirData && theirData.items) {
-                document.getElementById('trade-their-inv').innerHTML = theirData.items.map(id => {
-                    let c = ALL_COLORS.get(id); 
-                    return c ? `<div class="mini-color" style="background:${c.hex}; border-color:${c.x || '#aaa'}" title="${c.name} - $${c.val.toLocaleString()}"></div>` : '';
-                }).join('');
-            }
-
-            if(data.locked1 && data.locked2 && isP1) { db.collection('games').doc(state.code).collection('trades').doc(tId).update({status: 'completed'}); applySwap(data.o1, data.o2, false); }
+            db.collection('games').doc(state.code).collection('players').doc(t.p1).update({ cash: newThemCash, items: newThemItems, invSize: new Set(newThemItems).size });
+            notifyCenter("TRADE SUCCESSFUL", "DISMISS");
         }
 
-        function addTradeItem(i) { let c = state.inv[i]; if(!myOffer.cols.find(x => x.uId === c.uId)) { myOffer.cols.push(c); syncMyTrade(); } }
-        function removeTradeItem(i) { myOffer.cols.splice(i,1); syncMyTrade(); }
-        function syncMyTrade() {
-            if(!tId) return; sfx.click(); myOffer.cash = parseInt(document.getElementById('trade-my-cash').value) || 0;
-            if(myOffer.cash > state.cash) { myOffer.cash = state.cash; document.getElementById('trade-my-cash').value = state.cash; }
-            db.collection('games').doc(state.code).collection('trades').doc(tId).get().then(doc => {
-                if(doc.data().p1 === state.name) db.collection('games').doc(state.code).collection('trades').doc(tId).update({ o1: myOffer }); else db.collection('games').doc(state.code).collection('trades').doc(tId).update({ o2: myOffer });
-            });
-        }
-        function lockTrade() {
-            sfx.alert(); document.getElementById('btn-lock-trade').disabled = true;
-            db.collection('games').doc(state.code).collection('trades').doc(tId).get().then(doc => {
-                if(doc.data().p1 === state.name) db.collection('games').doc(state.code).collection('trades').doc(tId).update({ locked1: true }); else db.collection('games').doc(state.code).collection('trades').doc(tId).update({ locked2: true });
-            });
-        }
+        function cancelTradeDoc(id) { if(state.code) db.collection('games').doc(state.code).collection('trades').doc(id).update({status: 'cancelled'}); }
 
-        subs.push(db.collection('games').doc(state.code).collection('trades').onSnapshot(s => { s.docs.forEach(d => { let data = d.data(); if(data.status === 'completed' && data.p2 === state.name && tId === d.id) applySwap(data.o2, data.o1, false); }); }));
-
-        function applySwap(giveObj, getObj, isFirm = false) {
-            updateCash(getObj.cash - giveObj.cash);
-            if(isFirm) { giveObj.cols.forEach(gc => { let idx = state.inv.findIndex(i => i.id === gc.id); if(idx > -1) state.inv.splice(idx, 1); }); } 
-            else { giveObj.cols.forEach(gc => { state.inv = state.inv.filter(i => i.uId !== gc.uId); }); }
-            getObj.cols.forEach(gc => { state.inv.push({ uId: Math.random().toString(36).substr(2,9), id: gc.id, name: gc.name, hex: gc.hex, rarity: gc.rarity || getTierInfo(gc.val).r, val: gc.val, x: gc.x || getTierInfo(gc.val).x }); });
-            syncInv(); document.getElementById('btn-lock-trade').disabled = false; notifyCenter("TRADE SUCCESSFUL", "DISMISS");
-        }
-
+        // Bot AI: Fixed to use real inventories and 1 minute global limit implicitly (handled by rarity of ticks)
+        let lastBotTrade = 0;
         function executeBotAI() {
-            if(state.status !== 'active') return;
+            if(state.status !== 'active' || !state.code) return;
+            if(Date.now() - lastBotTrade < 60000) return; // Strict 1 bot trade per minute per host
+            
             let bots = Object.keys(state.players).filter(p => state.players[p].isBot); if(bots.length === 0) return;
             let botId = bots[Math.floor(Math.random() * bots.length)]; let bot = state.players[botId];
             let humans = Object.keys(state.players).filter(p => !state.players[p].isBot); if(humans.length === 0) return;
             let targetId = humans[Math.floor(Math.random() * humans.length)]; let target = state.players[targetId];
 
             let type = Math.floor(Math.random() * 3);
-            let tDoc = { p1: botId, p2: targetId, status: 'pending', ts: Date.now(), type: 'firm', o1: {cash:0, cols:[]}, o2: {cash:0, cols:[]} };
+            let tDoc = { p1: botId, p2: targetId, status: 'pending', ts: Date.now(), type: 'async', o1: {cash:0, cols:[]}, o2: {cash:0, cols:[]} };
 
-            if(type === 0 && target.invSize > 0) {
-                let cData = ALL_COLORS.get(target.items[Math.floor(Math.random() * target.items.length)]); if(!cData) return;
-                tDoc.o1.cash = Math.floor(cData.val * 1.2); tDoc.o2.cols = [cData];
-            } else if (type === 1 && bot.items && bot.items.length > 0) {
-                let cData = ALL_COLORS.get(bot.items[Math.floor(Math.random() * bot.items.length)]); if(!cData) return;
-                tDoc.o1.cols = [cData]; tDoc.o2.cash = Math.floor(cData.val * 0.9);
-            } else if (type === 2 && bot.items && bot.items.length > 0 && target.invSize > 0) {
-                tDoc.o1.cols = [ALL_COLORS.get(bot.items[Math.floor(Math.random() * bot.items.length)])];
-                tDoc.o2.cols = [ALL_COLORS.get(target.items[Math.floor(Math.random() * target.items.length)])];
+            if(type === 0 && target.invSize > 0 && bot.cash > 100) { // Bot offers cash for human color
+                let targetColorId = target.items[Math.floor(Math.random() * target.items.length)];
+                let cData = ALL_COLORS.get(targetColorId); if(!cData) return;
+                let offerCash = Math.floor(cData.val * (1.1 + Math.random()));
+                if(offerCash > bot.cash) return; // Bot must have cash
+                tDoc.o1.cash = offerCash; tDoc.o2.cols = [{id: cData.id, name: cData.name, hex: cData.hex, val: cData.val, r: getTierInfo(cData.val).r, x: getTierInfo(cData.val).x }];
+            } else if (type === 1 && bot.items && bot.items.length > 0) { // Bot offers color for human cash
+                let botColorId = bot.items[Math.floor(Math.random() * bot.items.length)];
+                let cData = ALL_COLORS.get(botColorId); if(!cData) return;
+                let requestCash = Math.floor(cData.val * 0.9);
+                if(target.cash < requestCash) return; // Bot won't ask for cash human doesn't have
+                tDoc.o1.cols = [{id: cData.id, name: cData.name, hex: cData.hex, val: cData.val, r: getTierInfo(cData.val).r, x: getTierInfo(cData.val).x }]; tDoc.o2.cash = requestCash;
+            } else if (type === 2 && bot.items && bot.items.length > 0 && target.invSize > 0) { // Bot offers color for human color
+                let bC = ALL_COLORS.get(bot.items[Math.floor(Math.random() * bot.items.length)]);
+                let tC = ALL_COLORS.get(target.items[Math.floor(Math.random() * target.items.length)]);
+                if(!bC || !tC) return;
+                tDoc.o1.cols = [{id: bC.id, name: bC.name, hex: bC.hex, val: bC.val, r: getTierInfo(bC.val).r, x: getTierInfo(bC.val).x }];
+                tDoc.o2.cols = [{id: tC.id, name: tC.name, hex: tC.hex, val: tC.val, r: getTierInfo(tC.val).r, x: getTierInfo(tC.val).x }];
             } else return;
+            
+            lastBotTrade = Date.now();
             db.collection('games').doc(state.code).collection('trades').add(tDoc);
         }
+
+        // Listen for async bot trade updates (If I accept, I update the bot. If I decline, do nothing). The Receiver logic handles it natively above!
 
         // ==========================================
         // 7. GLOBAL DEX & EVENTS
         // ==========================================
         function openGlobalDex() {
-            const m = document.getElementById('dex-overlay'), g = document.getElementById('global-dex-grid'); m.style.display = 'flex'; g.innerHTML = '';
+            const m = document.getElementById('dex-overlay'), g = document.getElementById('global-dex-grid'); if(!m || !g) return;
+            m.style.display = 'flex'; g.innerHTML = '';
             ALL_COLORS.forEach((c) => {
                 let div = document.createElement('div'); div.className = 'dex-cell';
                 div.style.background = c.hex; div.style.opacity = state.dex.has(c.id) ? '1' : '0.15';
@@ -630,27 +669,25 @@
         }
 
         function triggerGlobalEvent(e) {
-            notifyCenter("GLOBAL ANOMALY DETECTED!", "ACKNOWLEDGE");
-            if(e.type === "PACK") { state.evActive = true; renderStore(); setTimeout(()=>{ state.evActive=false; renderStore(); notifyCenter("Market Normalized", "OK"); }, 60000); }
-            else { let c = POOL.exc[Math.floor(Math.random()*2)]; state.inv.push({ uId: Math.random().toString(36).substr(2,9), id: c.id, name: c.name, hex: c.hex, rarity: "Mythical", val: c.val, x: "#f00" }); syncInv(); }
+            if(e.type === "ANOMALY") {
+                // Generate completely personalized 6 special packs from the 18 available
+                let shuffled = [...EV_PACKS].sort(() => 0.5 - Math.random());
+                state.localAnomalies = shuffled.slice(0, 6);
+                state.evActive = true; renderStore();
+                notifyCenter("ANOMALY DETECTED: 6 RARE PACKS AVAILABLE!", "VIEW", () => closeOverlay('dex-overlay'));
+                setTimeout(() => { state.evActive = false; state.localAnomalies = []; renderStore(); notifyCenter("Anomaly Dissipated.", "DISMISS"); }, 60000);
+            }
         }
 
         function triggerPersonalEvent() {
             if(state.status !== 'active') return;
-            if(Math.random() > 0.5 && state.inv.length > 0) {
-                let c = state.inv[Math.floor(Math.random() * state.inv.length)];
-                let off = Math.floor(c.val * (1.1 + Math.random()));
-                notifyCenter(`BOT_PRIME requests your [${c.name}] for $${off.toLocaleString()}.`, "ACCEPT", () => {
-                    state.inv = state.inv.filter(x => x.uId !== c.uId); updateCash(off); syncInv(); notifyCenter("BOT TRANSACTION COMPLETE", "DISMISS");
-                });
-            } else {
-                sfx.alert(); document.getElementById('wager-overlay').style.display = 'flex';
-                const bBox = document.getElementById('wager-buttons'); bBox.innerHTML = '';
-                ["Common", "Uncommon", "Rare", "Epic", "Legendary", "Mythical"].forEach(r => {
-                    let btn = document.createElement('button'); btn.innerText = r; btn.style.borderColor = "#aaa";
-                    btn.onclick = () => processWager(r); bBox.appendChild(btn);
-                });
-            }
+            let wOver = document.getElementById('wager-overlay'); if(!wOver) return;
+            sfx.alert(); wOver.style.display = 'flex';
+            const bBox = document.getElementById('wager-buttons'); bBox.innerHTML = '';
+            ["Common", "Uncommon", "Rare", "Epic", "Legendary", "Mythical"].forEach(r => {
+                let btn = document.createElement('button'); btn.innerText = r; btn.style.borderColor = "#aaa";
+                btn.onclick = () => processWager(r); bBox.appendChild(btn);
+            });
         }
 
         function processWager(guess) {
@@ -668,6 +705,7 @@
         async function endGame() {
             clearInterval(loop); subs.forEach(u => u()); sfx.play(150, 'sawtooth', 2.5, 0.2);
             document.body.innerHTML = `<div class="screen active" style="align-items:center; justify-content:center; text-align:center;"><h1 class="glow-pink" style="font-size:4.5rem;">NEXUS COLLAPSED</h1><h2 class="glow-cyan" style="margin:20px 0;">FINAL RANKINGS</h2><div id="ranks" style="background:rgba(0,0,0,0.8); border:1px solid var(--cyan); padding:30px; border-radius:8px; display:inline-block; text-align:left; font-size:1.4rem;"></div></div>`;
+            if(!state.code) { document.getElementById('ranks').innerHTML = "<p>HOST DISCONNECTED.</p>"; return; }
             try {
                 let p = await db.collection('games').doc(state.code).collection('players').orderBy('invSize','desc').orderBy('lastAcq','asc').get();
                 let html = ""; p.docs.forEach((d,i) => html += `<p style="margin:15px 0; border-bottom:1px solid #333; padding-bottom:5px;"><span style="color:var(--cyan)">${i+1}.</span> ${d.id} <span style="color:var(--pink); margin-left:25px;">[${d.data().invSize} Uniques]</span></p>`);
