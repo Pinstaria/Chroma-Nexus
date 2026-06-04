@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>CHROMA NEXUS // V7.1 PATCHED</title>
+    <title>CHROMA NEXUS // V7.1 SINGULARITY</title>
     <link rel="icon" href="data:,">
     
     <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
@@ -128,13 +128,15 @@
             <div class="glass panel">
                 <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px;">
                     <h2>Inventory</h2>
-                    <div style="text-align: right;"><span class="stat-label">Unique Spectrum</span><br><span id="unique-count" class="stat-val glow-cyan">0</span><span style="color:#666"> / 326</span></div>
+                    <!-- FIXED: Added total-colors-count ID back in so the JS null error is permanently destroyed -->
+                    <div style="text-align: right;"><span class="stat-label">Unique Spectrum</span><br><span id="unique-count" class="stat-val glow-cyan">0</span><span style="color:#666"> / <span id="total-colors-count">326</span></span></div>
                 </div>
                 <div id="inventory-grid" class="pack-grid"></div>
             </div>
         </main>
     </div>
 
+    <!-- MODALS -->
     <div id="pack-overlay" class="overlay">
         <h2 id="pack-title" class="glow-cyan" style="font-size: 2.2rem;">DECRYPTING CACHE...</h2>
         <div id="pack-cards" class="drawn-container"></div>
@@ -158,6 +160,7 @@
         </div>
     </div>
 
+    <!-- ASYNC DRAFT TRADE UI -->
     <div id="draft-overlay" class="overlay">
         <div class="modal" style="width: 1000px;">
             <h2 class="glow-cyan" style="text-align: center;">DRAFT TRANSMISSION TO: <span id="draft-target-name" class="glow-pink"></span></h2>
@@ -188,6 +191,7 @@
         </div>
     </div>
 
+    <!-- Incoming Trades Mailbox -->
     <div id="incoming-overlay" class="overlay">
         <div class="modal" style="width: 800px;">
             <div style="display: flex; justify-content: space-between; margin-bottom: 20px;">
@@ -198,10 +202,11 @@
         </div>
     </div>
 
+    <!-- Global Dex -->
     <div id="dex-overlay" class="overlay">
         <div class="modal" style="width: 95%;">
             <div style="display: flex; justify-content: space-between; margin-bottom: 15px;"><h2 class="glow-cyan">GLOBAL DEX</h2><button onclick="closeOverlay('dex-overlay')">X</button></div>
-            <p id="dex-info" style="font-size: 1.4rem; margin-bottom: 15px; color: var(--gold); min-height: 25px;">UNIQUE SPECTRUM OWNED: <span id="dex-owned-text">0/326</span></p>
+            <p id="dex-info" style="font-size: 1.4rem; margin-bottom: 15px; color: var(--gold); min-height: 25px;">UNIQUE SPECTRUM OWNED: <span id="dex-owned-text-header">0/326</span></p>
             <p id="dex-hover-info" style="min-height: 20px; color:#888; margin-bottom: 10px;">Select a spectrum coordinate to locate.</p>
             <div id="global-dex-grid" style="display: grid; grid-template-columns: repeat(auto-fill, minmax(35px, 1fr)); gap: 2px; background: #000; padding: 2px;"></div>
         </div>
@@ -213,10 +218,11 @@
         // ==========================================
         // PASTE YOUR REAL CONFIG OBJECT HERE:
         // Import the functions you need from the SDKs you need
+
 // TODO: Add SDKs for Firebase products that you want to use
 // https://firebase.google.com/docs/web/setup#available-libraries
 
-// Your web app's Firebas
+// Your web app's Firebase configuration
 // For Firebase JS SDK v7.20.0 and later, measurementId is optional
         const firebaseConfig = {
             apiKey: "AIzaSyAActFtDrgVBq8wAOujPzETSDaU3nhtjhU",
@@ -228,12 +234,11 @@
             measurementId: "G-L89L3WDE18"
         };
 
-// Initialize Firebase
         if (!firebase.apps.length) firebase.initializeApp(firebaseConfig);
         const db = firebase.firestore();
 
         // ==========================================
-        // 2. DATA ARCHITECTURE: 326 COLORS
+        // 2. DATA ARCHITECTURE: 326 COLORS (24 STD, 30 EV, 2 EXC)
         // ==========================================
         let cId = 1; const ALL_COLORS = new Map(); const POOL = { std: [], ev: [], exc: [], free: [], high: [] };
         
@@ -382,21 +387,24 @@
 
             subs.push(db.collection('games').doc(code).onSnapshot(s => {
                 let d = s.data(); 
-                // HOST DISCONNECT FIX: If doc is deleted (!s.exists or !d), forcefully end game for all clients immediately.
                 if(!s.exists || !d) { 
                     clearInterval(loop); subs.forEach(u => u());
                     document.body.innerHTML = `<div class="screen active" style="align-items:center; justify-content:center; text-align:center;"><h1 class="glow-pink" style="font-size:4.5rem;">NEXUS COLLAPSED</h1><p style="font-size:1.5rem; color:#888;">HOST DISCONNECTED. UPLINK SEVERED.</p></div>`;
                     return; 
                 }
-                // Normal game end triggers sorting screen
                 if(d.status === 'ended') { endGame(); return; }
                 
                 if(d.status === 'lobby') {
                     showScreen('lobby-screen'); let lcd = document.getElementById('lobby-code-display'); if(lcd) lcd.innerText = code;
                     if(state.isHost) { document.getElementById('btn-add-bot').style.display = 'block'; document.getElementById('btn-start-game').style.display = 'block'; }
                 } else if(d.status === 'active' && state.status !== 'active') {
-                    state.status = 'active'; state.endTime = d.end; state.nextEv = d.nextEv; document.getElementById('total-colors-count').innerText = TOTAL_COLORS;
-                    showScreen('game-screen'); document.getElementById('hud-party').innerText = code;
+                    state.status = 'active'; state.endTime = d.end; state.nextEv = d.nextEv; 
+                    
+                    // SAFE HTML UPDATES TO PREVENT NULL CRASH
+                    let tcc = document.getElementById('total-colors-count'); if(tcc) tcc.innerText = TOTAL_COLORS;
+                    showScreen('game-screen'); 
+                    let hp = document.getElementById('hud-party'); if(hp) hp.innerText = code;
+                    
                     renderStore(); loop = setInterval(gameLoop, 1000);
                 }
                 if(d.status === 'active') { state.endTime = d.end; state.nextEv = d.nextEv; }
@@ -441,7 +449,8 @@
         function gameLoop() {
             const now = Date.now(); const left = Math.max(0, state.endTime - now); const ev = Math.max(0, state.nextEv - now);
             const f = (ms) => { let s = Math.floor(ms/1000); return `${String(Math.floor(s/60)).padStart(2,'0')}:${String(s%60).padStart(2,'0')}`; };
-            document.getElementById('hud-time').innerText = f(left); document.getElementById('hud-event').innerText = f(ev);
+            let ht = document.getElementById('hud-time'); if(ht) ht.innerText = f(left); 
+            let he = document.getElementById('hud-event'); if(he) he.innerText = f(ev);
             
             if(left===0 && state.isHost && state.code) db.collection('games').doc(state.code).update({status: 'ended'});
             
@@ -501,12 +510,12 @@
             setTimeout(() => { document.getElementById('pack-title').innerText = "ACQUISITION COMPLETE"; b.style.display = 'block'; state.inv.push(...drawn); syncInv(); }, 2800);
         }
 
-        function updateCash(amt) { state.cash += amt; document.getElementById('hud-cash').innerText = state.cash.toLocaleString(); syncDB(); }
+        function updateCash(amt) { state.cash += amt; let hc = document.getElementById('hud-cash'); if(hc) hc.innerText = state.cash.toLocaleString(); syncDB(); }
 
         function syncInv() {
             state.dex.clear(); state.inv.forEach(i => state.dex.add(i.id));
             let uc = document.getElementById('unique-count'); if(uc) uc.innerText = state.dex.size;
-            let doxt = document.getElementById('dex-owned-text'); if(doxt) doxt.innerText = `${state.dex.size}/${TOTAL_COLORS}`;
+            let doxt = document.getElementById('dex-owned-text-header'); if(doxt) doxt.innerText = `${state.dex.size}/${TOTAL_COLORS}`;
             syncDB();
             if(state.dex.size >= TOTAL_COLORS && state.isHost && state.code) db.collection('games').doc(state.code).update({status: 'ended'});
             
@@ -541,18 +550,21 @@
         function openDraftTrade(targetName) {
             if(Date.now() - lastTradeSent < 60000) return notifyCenter("UPLINK COOLING DOWN (1 Min Wait)", "ACKNOWLEDGE");
             closeOverlay('hub-overlay'); draftTarget = targetName; draftOffer = {cash:0, cols:[]}; draftRequest = {cash:0, cols:[]};
-            document.getElementById('draft-target-name').innerText = targetName; document.getElementById('draft-my-cash').value = 0; document.getElementById('draft-their-cash').value = 0;
-            document.getElementById('draft-overlay').style.display = 'flex'; sfx.click(); renderDraftUI();
+            let dtn = document.getElementById('draft-target-name'); if(dtn) dtn.innerText = targetName; 
+            let dmc = document.getElementById('draft-my-cash'); if(dmc) dmc.value = 0; 
+            let dtc = document.getElementById('draft-their-cash'); if(dtc) dtc.value = 0;
+            let ov = document.getElementById('draft-overlay'); if(ov) { ov.style.display = 'flex'; sfx.click(); renderDraftUI(); }
         }
 
         function renderDraftUI() {
-            document.getElementById('draft-my-offer').innerHTML = draftOffer.cols.map((c,i) => `<div class="trade-item-row" style="border-color:${c.x}" onclick="removeDraftOffer(${i})"><span style="color:${c.x}">[${c.r}] ${c.name}</span> <span>$${c.val.toLocaleString()}</span></div>`).join('');
-            document.getElementById('draft-my-inv').innerHTML = state.inv.map((c,i) => `<div class="trade-item-row" style="border-color:${c.x}" onclick="addDraftOffer(${i})"><span style="color:${c.x}">[${c.r}] ${c.name}</span> <span>$${c.val.toLocaleString()}</span></div>`).join('');
+            let dmo = document.getElementById('draft-my-offer'); if(dmo) dmo.innerHTML = draftOffer.cols.map((c,i) => `<div class="trade-item-row" style="border-color:${c.x}" onclick="removeDraftOffer(${i})"><span style="color:${c.x}">[${c.r}] ${c.name}</span> <span>$${c.val.toLocaleString()}</span></div>`).join('');
+            let dmi = document.getElementById('draft-my-inv'); if(dmi) dmi.innerHTML = state.inv.map((c,i) => `<div class="trade-item-row" style="border-color:${c.x}" onclick="addDraftOffer(${i})"><span style="color:${c.x}">[${c.r}] ${c.name}</span> <span>$${c.val.toLocaleString()}</span></div>`).join('');
             
-            document.getElementById('draft-their-offer').innerHTML = draftRequest.cols.map((c,i) => `<div class="trade-item-row" style="border-color:${c.x}" onclick="removeDraftRequest(${i})"><span style="color:${c.x}">[${c.r}] ${c.name}</span> <span>$${c.val.toLocaleString()}</span></div>`).join('');
+            let dto = document.getElementById('draft-their-offer'); if(dto) dto.innerHTML = draftRequest.cols.map((c,i) => `<div class="trade-item-row" style="border-color:${c.x}" onclick="removeDraftRequest(${i})"><span style="color:${c.x}">[${c.r}] ${c.name}</span> <span>$${c.val.toLocaleString()}</span></div>`).join('');
             let theirData = state.players[draftTarget];
-            if (theirData && theirData.items) {
-                document.getElementById('draft-their-inv').innerHTML = theirData.items.map((id, i) => {
+            let dti = document.getElementById('draft-their-inv');
+            if (theirData && theirData.items && dti) {
+                dti.innerHTML = theirData.items.map((id, i) => {
                     let c = ALL_COLORS.get(id); if(!c) return ''; let tier = getTierInfo(c.val);
                     return `<div class="trade-item-row" style="border-color:${tier.x}" onclick="addDraftRequest('${c.id}')"><span style="color:${tier.x}">[${tier.r}] ${c.name}</span> <span>$${c.val.toLocaleString()}</span></div>`;
                 }).join('');
@@ -565,9 +577,9 @@
         function removeDraftRequest(i) { draftRequest.cols.splice(i,1); sfx.click(); renderDraftUI(); }
 
         function sendDraftOffer() {
-            draftOffer.cash = parseInt(document.getElementById('draft-my-cash').value) || 0;
+            let dmc = document.getElementById('draft-my-cash'); draftOffer.cash = dmc ? (parseInt(dmc.value) || 0) : 0;
             if(draftOffer.cash > state.cash) { notifyCenter("INSUFFICIENT CREDITS FOR DRAFT", "DISMISS"); return; }
-            draftRequest.cash = parseInt(document.getElementById('draft-their-cash').value) || 0;
+            let dtc = document.getElementById('draft-their-cash'); draftRequest.cash = dtc ? (parseInt(dtc.value) || 0) : 0;
             
             lastTradeSent = Date.now(); closeOverlay('draft-overlay'); notifyCenter(`Uplink transmission sent to ${draftTarget}`, "OK");
             if(state.code) db.collection('games').doc(state.code).collection('trades').add({ p1: state.name, p2: draftTarget, status: 'pending', type: 'async', ts: Date.now(), o1: draftOffer, o2: draftRequest });
@@ -575,7 +587,7 @@
 
         function openIncomingTrades() {
             let ov = document.getElementById('incoming-overlay'); if(!ov) return; ov.style.display = 'flex'; sfx.click();
-            const list = document.getElementById('incoming-list'); list.innerHTML = '';
+            const list = document.getElementById('incoming-list'); if(!list) return; list.innerHTML = '';
             let keys = Object.keys(pendingTradesCache);
             if(keys.length === 0) return list.innerHTML = "<p style='color:#888;'>No pending transmissions.</p>";
             
@@ -669,7 +681,10 @@
             ALL_COLORS.forEach((c) => {
                 let div = document.createElement('div'); div.className = 'dex-cell';
                 div.style.background = c.hex; div.style.opacity = state.dex.has(c.id) ? '1' : '0.15';
-                div.onmouseenter = () => { let owners = Object.keys(state.players).filter(p => state.players[p].items && state.players[p].items.includes(c.id)); document.getElementById('dex-hover-info').innerText = `${c.name} - $${c.val.toLocaleString()} | Owned by: ${owners.length > 0 ? owners.join(', ') : 'None'}`; };
+                div.onmouseenter = () => { 
+                    let owners = Object.keys(state.players).filter(p => state.players[p].items && state.players[p].items.includes(c.id)); 
+                    let dhi = document.getElementById('dex-hover-info'); if(dhi) dhi.innerText = `${c.name} - $${c.val.toLocaleString()} | Owned by: ${owners.length > 0 ? owners.join(', ') : 'None'}`; 
+                };
                 g.appendChild(div);
             });
         }
@@ -688,7 +703,7 @@
             if(state.status !== 'active') return;
             let wOver = document.getElementById('wager-overlay'); if(!wOver) return;
             sfx.alert(); wOver.style.display = 'flex';
-            const bBox = document.getElementById('wager-buttons'); bBox.innerHTML = '';
+            const bBox = document.getElementById('wager-buttons'); if(!bBox) return; bBox.innerHTML = '';
             ["Common", "Uncommon", "Rare", "Epic", "Legendary", "Mythical"].forEach(r => {
                 let btn = document.createElement('button'); btn.innerText = r; btn.style.borderColor = "#aaa";
                 btn.onclick = () => processWager(r); bBox.appendChild(btn);
@@ -705,29 +720,17 @@
             else { notifyCenter(`WAGER LOST. Drawn Tier: ${actual}`, "DISMISS"); }
         }
 
-        // ==========================================
-        // 8. CRITICAL END GAME SORTING FIX
-        // ==========================================
         async function endGame() {
             clearInterval(loop); subs.forEach(u => u()); sfx.play(150, 'sawtooth', 2.5, 0.2);
             document.body.innerHTML = `<div class="screen active" style="align-items:center; justify-content:center; text-align:center;"><h1 class="glow-pink" style="font-size:4.5rem;">NEXUS COLLAPSED</h1><h2 class="glow-cyan" style="margin:20px 0;">FINAL RANKINGS</h2><div id="ranks" style="background:rgba(0,0,0,0.8); border:1px solid var(--cyan); padding:30px; border-radius:8px; display:inline-block; text-align:left; font-size:1.4rem;">CALCULATING...</div></div>`;
             if(!state.code) return;
-            
             try {
-                // Fetch all players to sort in JS (Bypasses the Firebase Composite Index Error!)
                 let p = await db.collection('games').doc(state.code).collection('players').get();
                 let arr = []; p.docs.forEach(d => arr.push({ id: d.id, ...d.data() }));
-                
-                // Sort by Uniques (Descending), Tie-Break by Time Last Color Acquired (Ascending)
                 arr.sort((a,b) => b.invSize === a.invSize ? a.lastAcq - b.lastAcq : b.invSize - a.invSize);
-                
-                let html = ""; 
-                arr.forEach((d,i) => html += `<p style="margin:15px 0; border-bottom:1px solid #333; padding-bottom:5px;"><span style="color:var(--cyan)">${i+1}.</span> ${d.id} <span style="color:var(--pink); margin-left:25px;">[${d.invSize} Uniques]</span></p>`);
+                let html = ""; arr.forEach((d,i) => html += `<p style="margin:15px 0; border-bottom:1px solid #333; padding-bottom:5px;"><span style="color:var(--cyan)">${i+1}.</span> ${d.id} <span style="color:var(--pink); margin-left:25px;">[${d.invSize} Uniques]</span></p>`);
                 document.getElementById('ranks').innerHTML = html || "<p>NO DATA</p>";
-            } catch(e) { 
-                console.error(e); 
-                document.getElementById('ranks').innerHTML = "<p>ERROR FETCHING DATA.</p>"; 
-            }
+            } catch(e) { document.getElementById('ranks').innerHTML = "<p>ERROR FETCHING DATA.</p>"; }
         }
     </script>
 </body>
