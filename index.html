@@ -3,8 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>CHROMA NEXUS // V6.0</title>
-    <!-- Silences favicon error -->
+    <title>CHROMA NEXUS // V7.1 PATCHED</title>
     <link rel="icon" href="data:,">
     
     <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
@@ -56,7 +55,6 @@
         .card-face { position: absolute; width: 100%; height: 100%; backface-visibility: hidden; border-radius: 6px; display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 10px; }
         .card-back { background: repeating-linear-gradient(45deg, #111, #111 10px, #222 10px, #222 20px); border: 2px solid #444; transform: rotateY(180deg); } .card-front { background: #05050A; border: 2px solid; }
 
-        /* Asynchronous Trading UI Styles */
         .trade-arena { display: flex; gap: 20px; margin-top: 20px; } .trade-side { flex: 1; border: 1px solid #333; padding: 15px; border-radius: 6px; background: rgba(0,0,0,0.4); }
         .trade-zone { min-height: 100px; margin-top: 10px; padding: 10px; background: #000; border: 1px dashed #555; display: flex; flex-direction: column; gap: 5px; overflow-y: auto; max-height: 150px;}
         .trade-item-row { display: flex; align-items: center; justify-content: space-between; background: rgba(255,255,255,0.05); padding: 5px 10px; border-radius: 4px; border-left: 3px solid; cursor: pointer; transition: 0.1s; }
@@ -74,16 +72,15 @@
 
     <div id="notification-hub"></div>
 
-    <!-- INITIALIZATION -->
     <div id="setup-screen" class="screen active" style="align-items: center; justify-content: center;">
         <div class="glass" style="width: 100%; max-width: 650px; text-align: center;">
             <h1 class="glow-cyan" style="font-size: 3.5rem; margin-bottom: 5px;">CHROMA NEXUS</h1>
-            <p style="color: #777; font-size: 1.1rem; margin-bottom: 25px;">SECURE SPECTRAL ECONOMY</p>
+            <p style="color: #777; font-size: 1.1rem; margin-bottom: 25px;">SECURE SPECTRAL ECONOMY // V7.1</p>
             <input type="text" id="playerName" placeholder="ENTER ALIAS..." required style="text-align: center; font-size: 1.3rem; margin-bottom: 25px;">
             <div style="display: flex; gap: 20px;">
                 <div class="glass" style="flex: 1; background: rgba(0,0,0,0.5);">
                     <h3 class="glow-cyan">HOST NODE</h3>
-                    <input type="number" id="gameDuration" placeholder="Duration (Mins)" value="15" style="margin: 10px 0;">
+                    <input type="number" id="gameDuration" placeholder="Duration (Mins)" value="20" style="margin: 10px 0;">
                     <input type="number" id="eventFreq" placeholder="Anomaly Freq (Mins)" value="2" style="margin-bottom: 15px;">
                     <button onclick="hostGame()" style="width: 100%;">CREATE LOBBY</button>
                 </div>
@@ -96,7 +93,6 @@
         </div>
     </div>
 
-    <!-- LOBBY SCREEN -->
     <div id="lobby-screen" class="screen" style="align-items: center; justify-content: center;">
         <div class="glass" style="width: 100%; max-width: 600px; text-align: center;">
             <h2 class="glow-cyan" style="font-size: 2.5rem;">NODE LOBBY: <span id="lobby-code-display" class="glow-pink"></span></h2>
@@ -109,7 +105,6 @@
         </div>
     </div>
 
-    <!-- DASHBOARD -->
     <div id="game-screen" class="screen">
         <header id="hud" class="glass">
             <div class="stat-box"><span class="stat-label">Node ID</span> <div id="hud-party" class="stat-val glow-cyan">---</div></div>
@@ -130,18 +125,16 @@
                 <h2>Market Terminal</h2>
                 <div id="store-grid" class="pack-grid" style="margin-top: 15px;"></div>
             </div>
-
             <div class="glass panel">
                 <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px;">
                     <h2>Inventory</h2>
-                    <div style="text-align: right;"><span class="stat-label">Unique Spectrum</span><br><span id="unique-count" class="stat-val glow-cyan">0</span><span style="color:#666"> / <span id="total-colors-count">218</span></span></div>
+                    <div style="text-align: right;"><span class="stat-label">Unique Spectrum</span><br><span id="unique-count" class="stat-val glow-cyan">0</span><span style="color:#666"> / 326</span></div>
                 </div>
                 <div id="inventory-grid" class="pack-grid"></div>
             </div>
         </main>
     </div>
 
-    <!-- MODALS -->
     <div id="pack-overlay" class="overlay">
         <h2 id="pack-title" class="glow-cyan" style="font-size: 2.2rem;">DECRYPTING CACHE...</h2>
         <div id="pack-cards" class="drawn-container"></div>
@@ -157,7 +150,6 @@
         </div>
     </div>
 
-    <!-- Hub to pick who to trade with -->
     <div id="hub-overlay" class="overlay">
         <div class="modal">
             <div style="display: flex; justify-content: space-between;"><h2>ESTABLISH UPLINK</h2><button onclick="closeOverlay('hub-overlay')">X</button></div>
@@ -166,33 +158,23 @@
         </div>
     </div>
 
-    <!-- NEW ASYNC DRAFT TRADE UI -->
     <div id="draft-overlay" class="overlay">
         <div class="modal" style="width: 1000px;">
             <h2 class="glow-cyan" style="text-align: center;">DRAFT TRANSMISSION TO: <span id="draft-target-name" class="glow-pink"></span></h2>
             <p style="text-align: center; color: #888; margin-top: 5px;">Select items by clicking them. They will receive this exact offer to accept or decline.</p>
             
             <div class="trade-arena">
-                <!-- My Side -->
                 <div class="trade-side">
                     <h3 class="glow-cyan">I WILL GIVE</h3>
-                    <div style="display: flex; align-items: center; gap: 10px; margin-top: 10px;">
-                        <span class="stat-label">CREDITS:</span>
-                        <input type="number" id="draft-my-cash" placeholder="0" value="0" style="width: 120px;">
-                    </div>
+                    <div style="display: flex; align-items: center; gap: 10px; margin-top: 10px;"><span class="stat-label">CREDITS:</span><input type="number" id="draft-my-cash" placeholder="0" value="0" style="width: 120px;"></div>
                     <h4 style="margin-top: 15px; color: #666; font-size: 0.8rem;">ATTACHED ITEMS (Click to remove):</h4>
                     <div class="trade-zone" id="draft-my-offer"></div>
                     <h4 style="margin-top: 15px; color: #666; font-size: 0.8rem;">MY INVENTORY (Click to attach):</h4>
                     <div class="trade-zone" id="draft-my-inv" style="border-color: #333; max-height: 150px;"></div>
                 </div>
-
-                <!-- Their Side -->
                 <div class="trade-side" style="border-color: var(--pink);">
                     <h3 class="glow-pink">I WANT</h3>
-                    <div style="display: flex; align-items: center; gap: 10px; margin-top: 10px;">
-                        <span class="stat-label" style="color: var(--pink);">CREDITS:</span>
-                        <input type="number" id="draft-their-cash" placeholder="0" value="0" style="width: 120px; border-color: var(--pink); color: var(--pink);">
-                    </div>
+                    <div style="display: flex; align-items: center; gap: 10px; margin-top: 10px;"><span class="stat-label" style="color: var(--pink);">CREDITS:</span><input type="number" id="draft-their-cash" placeholder="0" value="0" style="width: 120px; border-color: var(--pink); color: var(--pink);"></div>
                     <h4 style="margin-top: 15px; color: #666; font-size: 0.8rem;">REQUESTED ITEMS (Click to remove):</h4>
                     <div class="trade-zone" id="draft-their-offer" style="border-color: rgba(255,0,85,0.3);"></div>
                     <h4 style="margin-top: 15px; color: #666; font-size: 0.8rem;">THEIR ASSETS (Click to request):</h4>
@@ -206,7 +188,6 @@
         </div>
     </div>
 
-    <!-- Incoming Trades Mailbox -->
     <div id="incoming-overlay" class="overlay">
         <div class="modal" style="width: 800px;">
             <div style="display: flex; justify-content: space-between; margin-bottom: 20px;">
@@ -217,11 +198,10 @@
         </div>
     </div>
 
-    <!-- Global Dex -->
     <div id="dex-overlay" class="overlay">
         <div class="modal" style="width: 95%;">
             <div style="display: flex; justify-content: space-between; margin-bottom: 15px;"><h2 class="glow-cyan">GLOBAL DEX</h2><button onclick="closeOverlay('dex-overlay')">X</button></div>
-            <p id="dex-info" style="font-size: 1.4rem; margin-bottom: 15px; color: var(--gold); min-height: 25px;">UNIQUE SPECTRUM OWNED: <span id="dex-owned-text">0/218</span></p>
+            <p id="dex-info" style="font-size: 1.4rem; margin-bottom: 15px; color: var(--gold); min-height: 25px;">UNIQUE SPECTRUM OWNED: <span id="dex-owned-text">0/326</span></p>
             <p id="dex-hover-info" style="min-height: 20px; color:#888; margin-bottom: 10px;">Select a spectrum coordinate to locate.</p>
             <div id="global-dex-grid" style="display: grid; grid-template-columns: repeat(auto-fill, minmax(35px, 1fr)); gap: 2px; background: #000; padding: 2px;"></div>
         </div>
@@ -233,6 +213,11 @@
         // ==========================================
         // PASTE YOUR REAL CONFIG OBJECT HERE:
         // Import the functions you need from the SDKs you need
+// TODO: Add SDKs for Firebase products that you want to use
+// https://firebase.google.com/docs/web/setup#available-libraries
+
+// Your web app's Firebas
+// For Firebase JS SDK v7.20.0 and later, measurementId is optional
         const firebaseConfig = {
             apiKey: "AIzaSyAActFtDrgVBq8wAOujPzETSDaU3nhtjhU",
             authDomain: "packian.firebaseapp.com",
@@ -248,15 +233,16 @@
         const db = firebase.firestore();
 
         // ==========================================
-        // 2. DATA ARCHITECTURE (18 STD + 18 EVENT + 2 EXC = 218 Colors)
+        // 2. DATA ARCHITECTURE: 326 COLORS
         // ==========================================
         let cId = 1; const ALL_COLORS = new Map(); const POOL = { std: [], ev: [], exc: [], free: [], high: [] };
-        const PACK_PRICES = [50, 150, 350, 750, 1400, 2400, 3800, 5800, 8500, 12000, 16500, 22500, 30000, 40000, 52000, 68000, 88000, 180000];
+        
+        const PACK_PRICES = [50, 150, 350, 750, 1400, 2400, 3800, 5800, 8500, 12000, 16500, 22500, 30000, 40000, 52000, 68000, 88000, 115000, 150000, 195000, 250000, 320000, 410000, 525000];
         
         function getTierInfo(val) {
             if(val < 150) return { r: "Common", x: "#aaa" }; if(val < 1000) return { r: "Uncommon", x: "#0f0" };
             if(val < 5000) return { r: "Rare", x: "#08f" }; if(val < 25000) return { r: "Epic", x: "#a0f" };
-            if(val < 100000) return { r: "Legendary", x: "#f80" }; return { r: "Mythical", x: "#f00" };
+            if(val < 150000) return { r: "Legendary", x: "#f80" }; return { r: "Mythical", x: "#f00" };
         }
 
         const PACK_DATA = [
@@ -271,13 +257,19 @@
             { n: "Umber", data: [["Beige","#F5F5DC"], ["Khaki","#C3B091"], ["Chocolate","#7B3F00"], ["Umber","#635147"], ["Sienna","#882D17"], ["Walnut","#773F1A"]] },
             { n: "Graphite", data: [["Slate","#708090"], ["Ash","#B2BEB5"], ["Charcoal","#36454F"], ["Silver","#C0C0C0"], ["Graphite","#2B2B2B"], ["Fog","#8B9396"]] },
             { n: "Vibrant", data: [["Scarlet","#FF2400"], ["Vermilion","#E34234"], ["Chartreuse","#7FFF00"], ["Spring Green","#00FF7F"], ["Electric Blue","#7DF9FF"], ["Hot Pink","#FF69B4"]] },
-            { n: "Midnight", data: [["Burgundy","#800020"], ["Midnight Blue","#191970"], ["Pine","#1A2421"], ["Oxblood","#4A0000"], ["Aubergine","#472C4C"], ["Espresso","#4B3621"]] },
+            { n: "Midnight", data: [["Burgundy","#800020"], ["Midnight Blue","#191970"], ["Dark Pine","#1A2421"], ["Oxblood","#4A0000"], ["Aubergine","#472C4C"], ["Espresso","#4B3621"]] },
             { n: "Alabaster", data: [["Ivory","#FFFFF0"], ["Cream","#FFFDD0"], ["Alabaster","#F2F0E6"], ["Pearl","#EAE0C8"], ["Chiffon","#F1FFCD"], ["Linen","#FAF0E6"]] },
             { n: "Terracotta", data: [["Ochre","#CC7722"], ["Terracotta","#E2725B"], ["Moss","#8A9A5B"], ["Clay","#b66a50"], ["Sand","#C2B280"], ["Mud","#70543E"]] },
             { n: "Abyss", data: [["Cerulean","#007BA7"], ["Deep Indigo","#32127A"], ["Marine","#0020C2"], ["Deep Sea","#002A54"], ["Coral Reef","#FD7C6E"], ["Lagoon","#006B54"]] },
             { n: "Floral", data: [["Orchid","#DA70D6"], ["Iris","#5A4FCF"], ["Daisy","#FAFAFA"], ["Peony","#FF94A8"], ["Tulip","#FF878D"], ["Marigold","#EAA221"]] },
             { n: "Gemstone", data: [["Topaz","#FFC87C"], ["Malachite","#0BDA51"], ["Peridot","#E6E200"], ["Garnet","#733635"], ["Onyx","#353839"], ["Opal","#A8C3BC"]] },
-            { n: "Twilight", data: [["Dusk","#4E5481"], ["Mauve","#E0B0FF"], ["Deep Purple","#36013F"], ["Mulberry","#C54B8C"], ["Heliotrope","#DF73FF"], ["Byzantium","#702963"]] }
+            { n: "Twilight", data: [["Dusk","#4E5481"], ["Mauve","#E0B0FF"], ["Deep Purple","#36013F"], ["Mulberry","#C54B8C"], ["Heliotrope","#DF73FF"], ["Byzantium","#702963"]] },
+            { n: "Sunset", data: [["Crimson Sky","#FF3333"], ["Orange Blaze","#FF6600"], ["Golden Hour","#FFCC00"], ["Pink Horizon","#FF99CC"], ["Peach Glow","#FFBBAA"], ["Dusky Violet","#663366"]] },
+            { n: "Tundra", data: [["Ice White","#F0FFFF"], ["Glacier Blue","#B0E0E6"], ["Frost","#E6E6FA"], ["Arctic Cyan","#00CED1"], ["Snow","#FFFAFA"], ["Permafrost","#5F9EA0"]] },
+            { n: "Autumn", data: [["Fall Leaf","#D2691E"], ["Burnt Orange","#CC5500"], ["Harvest Gold","#DA9100"], ["Maple Red","#C11B17"], ["Acorn","#7E5C3E"], ["Dried Corn","#EEDC82"]] },
+            { n: "Orchard", data: [["Apple Red","#E23D28"], ["Pear Green","#D1E231"], ["Grape Purple","#6F2DA8"], ["Plum Dark","#5B3144"], ["Peach Fuzz","#FFCBA4"], ["Ripe Mango","#FF8243"]] },
+            { n: "Cafe", data: [["Mocha","#4E312D"], ["Latte","#C5A059"], ["Cappuccino","#8D5524"], ["Caramel","#FFD59A"], ["Vanilla","#F3E5AB"], ["Roasted Bean","#3B2F2F"]] },
+            { n: "Spring", data: [["Bud Green","#7BB661"], ["Blossom Pink","#FFB7C5"], ["Daffodil","#FFFF31"], ["Morning Sky","#8CBED6"], ["Tulip Red","#FF878D"], ["Dewdrop","#BCEEE2"]] }
         ];
 
         const STD_PACKS = PACK_DATA.map((p, i) => {
@@ -286,28 +278,54 @@
                 let uniqueVal = Math.floor(baseVal * Math.pow(1.6, j) + (cId * 11) + 7);
                 let inst = { id: `C${cId++}`, name: c[0], hex: c[1], val: uniqueVal };
                 POOL.std.push(inst); ALL_COLORS.set(inst.id, inst);
-                if(i < 3) POOL.free.push(inst); if(uniqueVal > 15000) POOL.high.push(inst);
+                if(i < 3) POOL.free.push(inst); if(uniqueVal > 25000) POOL.high.push(inst);
                 return inst;
             });
             return { id: `P${i}`, name: p.n + " Pack", cost: PACK_PRICES[i], colors: colors, type: 'std' };
         });
 
-        // Generate 18 Unique Event Packs for Anomalies
-        const EV_NAMES = ["Neon Anomaly", "Pastel Dream", "Metallic Core", "Radiant Void", "Solar Flare", "Abyssal Trench", "Toxic Spill", "Glacial Freeze", "Ethereal Mist", "Volcanic Ash", "Crystal Shard", "Prismatic Light", "Dark Matter", "Plasma Burst", "Cosmic Dust", "Nebula Swirl", "Quantum Flux", "Supernova"];
-        const EV_PACKS = EV_NAMES.map((n, i) => {
-            let colors = [];
-            for(let j=0; j<6; j++) {
-                let hue = Math.floor(Math.random() * 360);
-                let inst = { id: `C${cId++}`, name: `${n} Tier ${j+1}`, hex: `hsl(${hue}, 100%, 60%)`, val: Math.floor(50000 * Math.pow(1.3, j) + cId*13) };
-                POOL.ev.push(inst); ALL_COLORS.set(inst.id, inst); POOL.high.push(inst); colors.push(inst);
-            }
-            return { id: `E${i}`, name: n, cost: 250000, colors: colors, isEvent: true };
+        const EV_RAW = [
+            { n: "Neon Anomaly", d: [["Laser Pink","#FF10F0"], ["Proton Green","#39FF14"], ["Cyber Blue","#04D9FF"], ["Radio Yellow","#DFFF00"], ["Neon Orange","#FF5F1F"], ["Plasma Purple","#B026FF"]] },
+            { n: "Pastel Dream", d: [["Baby Blue","#89CFF0"], ["Mint Cream","#F5FFFA"], ["Peach Puff","#FFDAB9"], ["Lavender Blush","#FFF0F5"], ["Misty Rose","#FFE4E1"], ["Honeydew","#F0FFF0"]] },
+            { n: "Metallic Core", d: [["Copper","#B87333"], ["Bronze","#CD7F32"], ["Brass","#B5A642"], ["Platinum","#E5E4E2"], ["Steel","#434B4D"], ["Rose Gold","#B76E79"]] },
+            { n: "Radiant Void", d: [["Void Black","#0A0A0A"], ["Star White","#FDFDFF"], ["Pulsar Blue","#1E90FF"], ["Quasar Red","#FF2400"], ["Event Horizon","#111111"], ["Singularity","#000000"]] },
+            { n: "Solar Flare", d: [["Corona Yellow","#FFD700"], ["Flare Red","#FF4500"], ["Sunspot Orange","#FF8C00"], ["Prominence Pink","#FF69B4"], ["Photosphere White","#FFF8DC"], ["Chromosphere Gold","#DAA520"]] },
+            { n: "Toxic Spill", d: [["Biohazard Green","#7FFF00"], ["Sludge Brown","#556B2F"], ["Acid Yellow","#ADFF2F"], ["Venom Purple","#8A2BE2"], ["Corrosive Cyan","#00FFFF"], ["Fallout Grey","#708090"]] },
+            { n: "Glacial Freeze", d: [["Absolute Zero","#00BFFF"], ["Cryo Blue","#87CEFA"], ["Frostbite White","#F8F8FF"], ["Hailstone","#E0FFFF"], ["Iceberg Cyan","#AFEEEE"], ["Tundra Mist","#E6E6FA"]] },
+            { n: "Ethereal Mist", d: [["Phantom White","#F5F5F5"], ["Ghostly Grey","#DCDCDC"], ["Specter Blue","#ADD8E6"], ["Spirit Purple","#DDA0DD"], ["Apparition Pink","#FFB6C1"], ["Wraith Green","#98FB98"]] },
+            { n: "Volcanic Ash", d: [["Magma Red","#8B0000"], ["Lava Orange","#FF4500"], ["Ash Grey","#808080"], ["Pumice Stone","#A9A9A9"], ["Basalt Black","#2F4F4F"], ["Obsidian Dark","#191970"]] },
+            { n: "Crystal Shard", d: [["Quartz Pink","#FFC0CB"], ["Sapphire Shard","#0000CD"], ["Emerald Cut","#50C878"], ["Diamond White","#F0F8FF"], ["Amethyst Raw","#9966CC"], ["Beryl Green","#7FFFD4"]] },
+            { n: "Prismatic Light", d: [["Spectrum Red","#FF0000"], ["Prism Orange","#FFA500"], ["Refracted Yellow","#FFFF00"], ["Wavelength Green","#008000"], ["Dispersed Blue","#0000FF"], ["Diffracted Purple","#800080"]] },
+            { n: "Dark Matter", d: [["Antimatter Black","#0D0D0D"], ["Dark Energy Purple","#4B0082"], ["Cosmic Void","#000008"], ["Invisible Mass","#1A1A1A"], ["Shadow Realm","#2E2B5F"], ["Obscured Galaxy","#1B1B3A"]] },
+            { n: "Plasma Burst", d: [["Ionized Blue","#00BFFF"], ["Plasma Pink","#FF1493"], ["Magnetic Red","#DC143C"], ["Thermal Orange","#FF7F50"], ["Kinetic Yellow","#FFD700"], ["Superheated White","#FFFFF0"]] },
+            { n: "Cosmic Dust", d: [["Nebula Pink","#FFC0CB"], ["Stardust Gold","#EEE8AA"], ["Comet Tail White","#F5F5F5"], ["Asteroid Ice","#E0FFFF"], ["Meteor Grey","#778899"], ["Cosmic Debris","#A9A9A9"]] },
+            { n: "Nebula Swirl", d: [["Orion Red","#B22222"], ["Crab Green","#32CD32"], ["Eagle Blue","#4682B4"], ["Helix Purple","#9370DB"], ["Tarantula Pink","#FF69B4"], ["Carina Cyan","#00CED1"]] },
+            { n: "Quantum Flux", d: [["Quark Red","#FF4500"], ["Lepton Green","#00FF7F"], ["Boson Blue","#1E90FF"], ["Fermion Yellow","#FFD700"], ["Gluon Pink","#FF1493"], ["Hadron Purple","#8A2BE2"]] },
+            { n: "Supernova", d: [["Stellar Explosion","#FF8C00"], ["Core Collapse","#8B0000"], ["Nova Remnant","#483D8B"], ["Shockwave Blue","#00FFFF"], ["Gamma Ray Green","#32CD32"], ["X-Ray Violet","#EE82EE"]] },
+            { n: "Cyberpunk", d: [["Matrix Green","#00FF00"], ["Synthwave Pink","#FF00FF"], ["Hologram Blue","#00FFFF"], ["Neon Alley","#8A2BE2"], ["Chrome City","#C0C0C0"], ["Digital Red","#FF0000"]] },
+            { n: "Bioluminescent", d: [["Deep Sea Glow","#00FA9A"], ["Algae Green","#2E8B57"], ["Jellyfish Blue","#1E90FF"], ["Firefly Squid","#00FFFF"], ["Plankton Cyan","#E0FFFF"], ["Anglerfish Pink","#FF69B4"]] },
+            { n: "Abyssal Trench", d: [["Mariana Black","#000005"], ["Benthic Blue","#00008B"], ["Hadal Purple","#4B0082"], ["Trench Floor","#2F4F4F"], ["Bathyal Green","#006400"], ["Deep Sea","#191970"]] },
+            { n: "Holographic", d: [["Holo Silver","#E6E8FA"], ["Illusion Pink","#FFB6C1"], ["Mirage Blue","#87CEEB"], ["Virtual Green","#98FB98"], ["Fake Gold","#EEE8AA"], ["Sim Cyan","#E0FFFF"]] },
+            { n: "Radioactive", d: [["Radium Green","#39FF14"], ["Uranium Glow","#7FFF00"], ["Plutonium Blue","#00FFFF"], ["Isotope Pink","#FF1493"], ["Decay Grey","#A9A9A9"], ["Half-Life Yellow","#ADFF2F"]] },
+            { n: "Alien Flora", d: [["Xenoflora Purple","#9932CC"], ["Mutant Vine Green","#32CD32"], ["Spore Blue","#4169E1"], ["Pollen Pink","#FF69B4"], ["Exotic Nectar","#FFD700"], ["Outer Petal","#FF4500"]] },
+            { n: "Deep Space", d: [["Vacuum Black","#050505"], ["Galaxy Swirl","#4B0082"], ["Asteroid Belt","#696969"], ["Comet Dust","#D3D3D3"], ["Pulsar Ray","#00BFFF"], ["Void Edge","#000022"]] },
+            { n: "Mystic Aura", d: [["Arcane Purple","#8A2BE2"], ["Magic Missile Blue","#0000FF"], ["Spellbook Leather","#8B4513"], ["Mana Potion Blue","#1E90FF"], ["Health Red","#FF0000"], ["Stamina Yellow","#FFFF00"]] },
+            { n: "Eldritch", d: [["Eldritch Blue","#483D8B"], ["Tentacle Purple","#800080"], ["Ancient Stone","#708090"], ["Cultist Red","#8B0000"], ["Sanity Green","#008000"], ["Madness Yellow","#BDB76B"]] },
+            { n: "Astro", d: [["Astronaut White","#F8F8FF"], ["Rover Silver","#C0C0C0"], ["Space Station Grey","#808080"], ["Orbit Blue","#4682B4"], ["Reentry Red","#B22222"], ["Splashdown Cyan","#00CED1"]] },
+            { n: "Time Warp", d: [["Paradox Pink","#FF00FF"], ["Tachyon Green","#00FF00"], ["Chronos Blue","#0000FF"], ["Future Chrome","#E5E4E2"], ["Past Sepia","#704214"], ["Timeline Silver","#C0C0C0"]] },
+            { n: "Hyperspace", d: [["Warp Speed White","#FFFFFF"], ["Jump Drive Blue","#00FFFF"], ["Starstreak Cyan","#E0FFFF"], ["Lightyear Yellow","#FFFFE0"], ["Parsec Purple","#DDA0DD"], ["Hyperdrive Pink","#FFC0CB"]] },
+            { n: "Dimensional", d: [["4D Tesseract","#A9A9A9"], ["5D Hypercube","#778899"], ["Parallel Universe Pink","#FF69B4"], ["Alternate Reality Blue","#87CEEB"], ["Wormhole Green","#32CD32"], ["Portal Orange","#FF8C00"]] }
+        ];
+
+        const EV_PACKS = EV_RAW.map((p, i) => {
+            let colors = p.d.map((c,j) => { let inst = { id: `C${cId++}`, name: c[0], hex: c[1], val: Math.floor(80000 * Math.pow(1.4, j) + cId*13) }; POOL.ev.push(inst); ALL_COLORS.set(inst.id, inst); POOL.high.push(inst); return inst; });
+            return { id: `E${i}`, name: p.n, cost: 500000, colors: colors, isEvent: true };
         });
 
-        const exc1 = { id: `C${cId++}`, name: "Titanium White", hex: "#FFFFFF", val: 1250000 }; const exc2 = { id: `C${cId++}`, name: "Vantablack", hex: "#000000", val: 1500000 };
+        const exc1 = { id: `C${cId++}`, name: "Titanium White", hex: "#FFFFFF", val: 2500000 }; const exc2 = { id: `C${cId++}`, name: "Vantablack", hex: "#000000", val: 3000000 };
         POOL.exc.push(exc1, exc2); ALL_COLORS.set(exc1.id, exc1); ALL_COLORS.set(exc2.id, exc2); POOL.high.push(exc1, exc2);
         
-        const TOTAL_COLORS = ALL_COLORS.size; // Should be 218
+        const TOTAL_COLORS = ALL_COLORS.size; // 326
 
         // ==========================================
         // 3. SYNTH AUDIO & NOTIFICATIONS
@@ -363,7 +381,16 @@
             db.collection('games').doc(code).collection('players').doc(name).set({ cash: state.cash, invSize: 0, lastAcq: Date.now(), items: [], isBot: false });
 
             subs.push(db.collection('games').doc(code).onSnapshot(s => {
-                let d = s.data(); if(!s.exists || !d || d.status === 'ended') { endGame(); return; }
+                let d = s.data(); 
+                // HOST DISCONNECT FIX: If doc is deleted (!s.exists or !d), forcefully end game for all clients immediately.
+                if(!s.exists || !d) { 
+                    clearInterval(loop); subs.forEach(u => u());
+                    document.body.innerHTML = `<div class="screen active" style="align-items:center; justify-content:center; text-align:center;"><h1 class="glow-pink" style="font-size:4.5rem;">NEXUS COLLAPSED</h1><p style="font-size:1.5rem; color:#888;">HOST DISCONNECTED. UPLINK SEVERED.</p></div>`;
+                    return; 
+                }
+                // Normal game end triggers sorting screen
+                if(d.status === 'ended') { endGame(); return; }
+                
                 if(d.status === 'lobby') {
                     showScreen('lobby-screen'); let lcd = document.getElementById('lobby-code-display'); if(lcd) lcd.innerText = code;
                     if(state.isHost) { document.getElementById('btn-add-bot').style.display = 'block'; document.getElementById('btn-start-game').style.display = 'block'; }
@@ -382,7 +409,6 @@
             
             subs.push(db.collection('games').doc(code).collection('events').onSnapshot(s => { s.docChanges().forEach(c => { if(c.type==='added' && Date.now() - c.doc.data().ts < 5000) triggerGlobalEvent(c.doc.data()); }); }));
             
-            // Listen for Incoming Mailbox Trades
             subs.push(db.collection('games').doc(code).collection('trades').where('p2', '==', name).where('status', '==', 'pending').onSnapshot(s => { 
                 s.docChanges().forEach(c => { 
                     if(c.type==='added') { pendingTradesCache[c.doc.id] = c.doc.data(); notifyCenter(`INCOMING UPLINK FROM ${c.doc.data().p1}`, "VIEW", openIncomingTrades); updateTradeBadge(); }
@@ -390,7 +416,6 @@
                 }); 
             }));
 
-            // Auto-cancel 60s
             setInterval(() => {
                 let now = Date.now();
                 Object.keys(pendingTradesCache).forEach(id => {
@@ -405,7 +430,7 @@
         function addBot() {
             if(!state.code) return; let bName = "BOT_" + Math.random().toString(36).substr(2,4).toUpperCase(); let bItems = [];
             for(let i=0; i<10; i++) bItems.push(POOL.std[Math.floor(Math.random()*POOL.std.length)].id);
-            db.collection('games').doc(state.code).collection('players').doc(bName).set({ cash: 15000, invSize: 10, items: bItems, isBot: true });
+            db.collection('games').doc(state.code).collection('players').doc(bName).set({ cash: 150000, invSize: 10, items: bItems, isBot: true });
         }
 
         function startGame() {
@@ -454,8 +479,8 @@
             });
 
             const btnZenith = document.createElement('div'); btnZenith.className = 'item-card'; btnZenith.style.borderColor = 'var(--gold)';
-            btnZenith.innerHTML = `<h4 style="color:var(--gold); font-size:1rem;">OMNI-ZENITH</h4><p class="stat-val" style="color:var(--gold);">$500,000</p><button style="margin-top:10px; width:100%;" class="btn-gold">PULL</button>`;
-            btnZenith.querySelector('button').onclick = (e) => { e.stopPropagation(); if(state.cash >= 500000) { sfx.buy(); updateCash(-500000); processWeightedDraw(POOL.high); } else { notifyCenter("INSUFFICIENT FUNDS", "DISMISS"); sfx.alert(); }};
+            btnZenith.innerHTML = `<h4 style="color:var(--gold); font-size:1rem;">OMNI-ZENITH</h4><p class="stat-val" style="color:var(--gold);">$1,000,000</p><button style="margin-top:10px; width:100%;" class="btn-gold">PULL</button>`;
+            btnZenith.querySelector('button').onclick = (e) => { e.stopPropagation(); if(state.cash >= 1000000) { sfx.buy(); updateCash(-1000000); processWeightedDraw(POOL.high); } else { notifyCenter("INSUFFICIENT FUNDS", "DISMISS"); sfx.alert(); }};
             g.appendChild(btnZenith);
         }
 
@@ -497,7 +522,7 @@
         function syncDB() { if(state.code) db.collection('games').doc(state.code).collection('players').doc(state.name).update({ cash: state.cash, invSize: state.dex.size, lastAcq: Date.now(), items: Array.from(state.dex) }); }
 
         // ==========================================
-        // 6. ASYNC MAILBOX TRADING (NEW)
+        // 6. ASYNC MAILBOX TRADING
         // ==========================================
         let draftTarget = ""; let draftOffer = { cash: 0, cols: [] }; let draftRequest = { cash: 0, cols: [] };
 
@@ -516,26 +541,19 @@
         function openDraftTrade(targetName) {
             if(Date.now() - lastTradeSent < 60000) return notifyCenter("UPLINK COOLING DOWN (1 Min Wait)", "ACKNOWLEDGE");
             closeOverlay('hub-overlay'); draftTarget = targetName; draftOffer = {cash:0, cols:[]}; draftRequest = {cash:0, cols:[]};
-            document.getElementById('draft-target-name').innerText = targetName;
-            document.getElementById('draft-my-cash').value = 0; document.getElementById('draft-their-cash').value = 0;
+            document.getElementById('draft-target-name').innerText = targetName; document.getElementById('draft-my-cash').value = 0; document.getElementById('draft-their-cash').value = 0;
             document.getElementById('draft-overlay').style.display = 'flex'; sfx.click(); renderDraftUI();
         }
 
         function renderDraftUI() {
-            // Render My Attached Offer
             document.getElementById('draft-my-offer').innerHTML = draftOffer.cols.map((c,i) => `<div class="trade-item-row" style="border-color:${c.x}" onclick="removeDraftOffer(${i})"><span style="color:${c.x}">[${c.r}] ${c.name}</span> <span>$${c.val.toLocaleString()}</span></div>`).join('');
-            // Render My Inventory (to pick from)
             document.getElementById('draft-my-inv').innerHTML = state.inv.map((c,i) => `<div class="trade-item-row" style="border-color:${c.x}" onclick="addDraftOffer(${i})"><span style="color:${c.x}">[${c.r}] ${c.name}</span> <span>$${c.val.toLocaleString()}</span></div>`).join('');
             
-            // Render Requested Items
             document.getElementById('draft-their-offer').innerHTML = draftRequest.cols.map((c,i) => `<div class="trade-item-row" style="border-color:${c.x}" onclick="removeDraftRequest(${i})"><span style="color:${c.x}">[${c.r}] ${c.name}</span> <span>$${c.val.toLocaleString()}</span></div>`).join('');
-            // Render Their Assets
             let theirData = state.players[draftTarget];
             if (theirData && theirData.items) {
                 document.getElementById('draft-their-inv').innerHTML = theirData.items.map((id, i) => {
-                    let c = ALL_COLORS.get(id); 
-                    if(!c) return '';
-                    let tier = getTierInfo(c.val);
+                    let c = ALL_COLORS.get(id); if(!c) return ''; let tier = getTierInfo(c.val);
                     return `<div class="trade-item-row" style="border-color:${tier.x}" onclick="addDraftRequest('${c.id}')"><span style="color:${tier.x}">[${tier.r}] ${c.name}</span> <span>$${c.val.toLocaleString()}</span></div>`;
                 }).join('');
             }
@@ -581,30 +599,23 @@
         function acceptAsyncTrade(id) {
             let t = pendingTradesCache[id]; if(!t || !state.code) return; 
             
-            // Verify I have the required cash and items
             if(state.cash < t.o2.cash) return notifyCenter("INSUFFICIENT CREDITS TO ACCEPT", "DISMISS");
             let hasCols = t.o2.cols.every(req => state.inv.some(ic => ic.id === req.id));
             if(!hasCols) return notifyCenter("MISSING REQUESTED COLORS", "DISMISS");
 
-            // Verify They have the offered cash and items (Receiver acts as server)
             let them = state.players[t.p1]; if(!them) return;
             if(them.cash < t.o1.cash) return notifyCenter(`OPERATIVE ${t.p1} LACKS CREDITS`, "DISMISS");
             let theyHaveCols = t.o1.cols.every(off => them.items.includes(off.id));
             if(!theyHaveCols) return notifyCenter(`OPERATIVE ${t.p1} NO LONGER HAS ASSETS`, "DISMISS");
 
-            // Process Transaction: Receiver does the DB work for both to avoid async desyncs
-            db.collection('games').doc(state.code).collection('trades').doc(id).update({status: 'completed'});
-            closeOverlay('incoming-overlay');
+            db.collection('games').doc(state.code).collection('trades').doc(id).update({status: 'completed'}); closeOverlay('incoming-overlay');
 
-            // 1. Update Me
             updateCash(t.o1.cash - t.o2.cash);
-            t.o2.cols.forEach(req => { let idx = state.inv.findIndex(i => i.id === req.id); if(idx > -1) state.inv.splice(idx, 1); }); // remove mine
+            t.o2.cols.forEach(req => { let idx = state.inv.findIndex(i => i.id === req.id); if(idx > -1) state.inv.splice(idx, 1); });
             t.o1.cols.forEach(off => { state.inv.push({ uId: Math.random().toString(36).substr(2,9), id: off.id, name: off.name, hex: off.hex, rarity: off.r || getTierInfo(off.val).r, val: off.val, x: off.x || getTierInfo(off.val).x }); });
             syncInv();
 
-            // 2. Update Them in DB directly
-            let newThemCash = them.cash - t.o1.cash + t.o2.cash;
-            let newThemItems = [...them.items];
+            let newThemCash = them.cash - t.o1.cash + t.o2.cash; let newThemItems = [...them.items];
             t.o1.cols.forEach(off => { let idx = newThemItems.indexOf(off.id); if(idx > -1) newThemItems.splice(idx, 1); });
             t.o2.cols.forEach(req => { newThemItems.push(req.id); });
             
@@ -614,11 +625,10 @@
 
         function cancelTradeDoc(id) { if(state.code) db.collection('games').doc(state.code).collection('trades').doc(id).update({status: 'cancelled'}); }
 
-        // Bot AI: Fixed to use real inventories and 1 minute global limit implicitly (handled by rarity of ticks)
         let lastBotTrade = 0;
         function executeBotAI() {
             if(state.status !== 'active' || !state.code) return;
-            if(Date.now() - lastBotTrade < 60000) return; // Strict 1 bot trade per minute per host
+            if(Date.now() - lastBotTrade < 60000) return; 
             
             let bots = Object.keys(state.players).filter(p => state.players[p].isBot); if(bots.length === 0) return;
             let botId = bots[Math.floor(Math.random() * bots.length)]; let bot = state.players[botId];
@@ -628,19 +638,17 @@
             let type = Math.floor(Math.random() * 3);
             let tDoc = { p1: botId, p2: targetId, status: 'pending', ts: Date.now(), type: 'async', o1: {cash:0, cols:[]}, o2: {cash:0, cols:[]} };
 
-            if(type === 0 && target.invSize > 0 && bot.cash > 100) { // Bot offers cash for human color
+            if(type === 0 && target.invSize > 0 && bot.cash > 100) { 
                 let targetColorId = target.items[Math.floor(Math.random() * target.items.length)];
-                let cData = ALL_COLORS.get(targetColorId); if(!cData) return;
-                let offerCash = Math.floor(cData.val * (1.1 + Math.random()));
-                if(offerCash > bot.cash) return; // Bot must have cash
+                let cData = ALL_COLORS.get(targetColorId); if(!cData) return; let offerCash = Math.floor(cData.val * (1.1 + Math.random()));
+                if(offerCash > bot.cash) return; 
                 tDoc.o1.cash = offerCash; tDoc.o2.cols = [{id: cData.id, name: cData.name, hex: cData.hex, val: cData.val, r: getTierInfo(cData.val).r, x: getTierInfo(cData.val).x }];
-            } else if (type === 1 && bot.items && bot.items.length > 0) { // Bot offers color for human cash
+            } else if (type === 1 && bot.items && bot.items.length > 0) { 
                 let botColorId = bot.items[Math.floor(Math.random() * bot.items.length)];
-                let cData = ALL_COLORS.get(botColorId); if(!cData) return;
-                let requestCash = Math.floor(cData.val * 0.9);
-                if(target.cash < requestCash) return; // Bot won't ask for cash human doesn't have
+                let cData = ALL_COLORS.get(botColorId); if(!cData) return; let requestCash = Math.floor(cData.val * 0.9);
+                if(target.cash < requestCash) return; 
                 tDoc.o1.cols = [{id: cData.id, name: cData.name, hex: cData.hex, val: cData.val, r: getTierInfo(cData.val).r, x: getTierInfo(cData.val).x }]; tDoc.o2.cash = requestCash;
-            } else if (type === 2 && bot.items && bot.items.length > 0 && target.invSize > 0) { // Bot offers color for human color
+            } else if (type === 2 && bot.items && bot.items.length > 0 && target.invSize > 0) { 
                 let bC = ALL_COLORS.get(bot.items[Math.floor(Math.random() * bot.items.length)]);
                 let tC = ALL_COLORS.get(target.items[Math.floor(Math.random() * target.items.length)]);
                 if(!bC || !tC) return;
@@ -651,8 +659,6 @@
             lastBotTrade = Date.now();
             db.collection('games').doc(state.code).collection('trades').add(tDoc);
         }
-
-        // Listen for async bot trade updates (If I accept, I update the bot. If I decline, do nothing). The Receiver logic handles it natively above!
 
         // ==========================================
         // 7. GLOBAL DEX & EVENTS
@@ -670,7 +676,6 @@
 
         function triggerGlobalEvent(e) {
             if(e.type === "ANOMALY") {
-                // Generate completely personalized 6 special packs from the 18 available
                 let shuffled = [...EV_PACKS].sort(() => 0.5 - Math.random());
                 state.localAnomalies = shuffled.slice(0, 6);
                 state.evActive = true; renderStore();
@@ -695,22 +700,34 @@
             if(state.cash < 5000) return notifyCenter("INSUFFICIENT FUNDS ($5k REQ)", "DISMISS");
             updateCash(-5000);
             
-            let pool = Array.from(ALL_COLORS.values());
-            let actual = getTierInfo(pool[Math.floor(Math.random() * pool.length)].val).r;
-            
+            let pool = Array.from(ALL_COLORS.values()); let actual = getTierInfo(pool[Math.floor(Math.random() * pool.length)].val).r;
             if(guess === actual) { notifyCenter(`WAGER WON! Drawn Tier: ${actual}`, "CLAIM", () => updateCash(50000)); }
             else { notifyCenter(`WAGER LOST. Drawn Tier: ${actual}`, "DISMISS"); }
         }
 
+        // ==========================================
+        // 8. CRITICAL END GAME SORTING FIX
+        // ==========================================
         async function endGame() {
             clearInterval(loop); subs.forEach(u => u()); sfx.play(150, 'sawtooth', 2.5, 0.2);
-            document.body.innerHTML = `<div class="screen active" style="align-items:center; justify-content:center; text-align:center;"><h1 class="glow-pink" style="font-size:4.5rem;">NEXUS COLLAPSED</h1><h2 class="glow-cyan" style="margin:20px 0;">FINAL RANKINGS</h2><div id="ranks" style="background:rgba(0,0,0,0.8); border:1px solid var(--cyan); padding:30px; border-radius:8px; display:inline-block; text-align:left; font-size:1.4rem;"></div></div>`;
-            if(!state.code) { document.getElementById('ranks').innerHTML = "<p>HOST DISCONNECTED.</p>"; return; }
+            document.body.innerHTML = `<div class="screen active" style="align-items:center; justify-content:center; text-align:center;"><h1 class="glow-pink" style="font-size:4.5rem;">NEXUS COLLAPSED</h1><h2 class="glow-cyan" style="margin:20px 0;">FINAL RANKINGS</h2><div id="ranks" style="background:rgba(0,0,0,0.8); border:1px solid var(--cyan); padding:30px; border-radius:8px; display:inline-block; text-align:left; font-size:1.4rem;">CALCULATING...</div></div>`;
+            if(!state.code) return;
+            
             try {
-                let p = await db.collection('games').doc(state.code).collection('players').orderBy('invSize','desc').orderBy('lastAcq','asc').get();
-                let html = ""; p.docs.forEach((d,i) => html += `<p style="margin:15px 0; border-bottom:1px solid #333; padding-bottom:5px;"><span style="color:var(--cyan)">${i+1}.</span> ${d.id} <span style="color:var(--pink); margin-left:25px;">[${d.data().invSize} Uniques]</span></p>`);
-                document.getElementById('ranks').innerHTML = html;
-            } catch(e) { document.getElementById('ranks').innerHTML = "<p>HOST DISCONNECTED. UPLINK SEVERED.</p>"; }
+                // Fetch all players to sort in JS (Bypasses the Firebase Composite Index Error!)
+                let p = await db.collection('games').doc(state.code).collection('players').get();
+                let arr = []; p.docs.forEach(d => arr.push({ id: d.id, ...d.data() }));
+                
+                // Sort by Uniques (Descending), Tie-Break by Time Last Color Acquired (Ascending)
+                arr.sort((a,b) => b.invSize === a.invSize ? a.lastAcq - b.lastAcq : b.invSize - a.invSize);
+                
+                let html = ""; 
+                arr.forEach((d,i) => html += `<p style="margin:15px 0; border-bottom:1px solid #333; padding-bottom:5px;"><span style="color:var(--cyan)">${i+1}.</span> ${d.id} <span style="color:var(--pink); margin-left:25px;">[${d.invSize} Uniques]</span></p>`);
+                document.getElementById('ranks').innerHTML = html || "<p>NO DATA</p>";
+            } catch(e) { 
+                console.error(e); 
+                document.getElementById('ranks').innerHTML = "<p>ERROR FETCHING DATA.</p>"; 
+            }
         }
     </script>
 </body>
