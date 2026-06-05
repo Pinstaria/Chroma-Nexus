@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>CHROMA NEXUS // V8.3 THE EXPANSE</title>
+    <title>CHROMA NEXUS // V8.4 ECONOMY UPDATE</title>
     <link rel="icon" href="data:,">
     
     <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
@@ -187,7 +187,6 @@
         .toast { background: rgba(0,240,255,0.1); border: 1px solid var(--cyan); padding: 15px 30px; font-family: var(--font-head); font-size: 1.3rem; animation: dropDown 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards; backdrop-filter: blur(10px); box-shadow: 0 5px 20px rgba(0,0,0,0.8); pointer-events: auto; display: flex; align-items: center; justify-content: space-between; gap: 20px; border-radius: 6px; }
         @keyframes dropDown { from { transform: translateY(-100%); opacity: 0; } to { transform: translateY(0); opacity: 1; } }
 
-        /* MOBILE FIX: Tap to view */
         .dex-cell { width: 100%; aspect-ratio: 1; border-radius: 2px; cursor: pointer; transition: 0.2s; position: relative; }
         .dex-cell:active { transform: scale(1.3); z-index: 10; border: 1px solid #fff; }
     </style>
@@ -200,7 +199,7 @@
     <div id="setup-screen" class="screen active" style="align-items: center; justify-content: center;">
         <div class="glass" style="width: 100%; max-width: 650px; text-align: center;">
             <h1 class="glow-cyan" style="font-size: 3.5rem; margin-bottom: 5px;">CHROMA NEXUS</h1>
-            <p style="color: #777; font-size: 1.1rem; margin-bottom: 25px;">SECURE SPECTRAL ECONOMY // V8.3</p>
+            <p style="color: #777; font-size: 1.1rem; margin-bottom: 25px;">SECURE SPECTRAL ECONOMY // V8.4</p>
             
             <input type="text" id="playerName" placeholder="ENTER ALIAS..." required style="text-align: center; font-size: 1.3rem; margin-bottom: 25px;">
             
@@ -241,8 +240,9 @@
                 <div id="hud-party" class="stat-val glow-cyan">---</div>
             </div>
             <div class="stat-box">
+                <!-- STARTING CASH IS $0 NOW -->
                 <span class="stat-label">Credits</span> 
-                <div class="stat-val glow-pink" id="hud-cash-box">$<span id="hud-cash">500</span></div>
+                <div class="stat-val glow-pink" id="hud-cash-box">$<span id="hud-cash">0</span></div>
             </div>
             <div class="stat-box">
                 <span class="stat-label">Collapse In</span> 
@@ -382,6 +382,7 @@
         // 1. SAFEST AUDIO INITIALIZATION
         // ==========================================
         const actx = new (window.AudioContext || window.webkitAudioContext)();
+        
         const sfx = {
             play: (f, t, d, v=0.05) => { 
                 if(actx.state==='suspended') actx.resume(); 
@@ -434,7 +435,6 @@
         // ==========================================
         // 2. FIREBASE SETUP
         // ==========================================
-        // PASTE YOUR REAL CONFIG OBJECT HERE:
         const firebaseConfig = {
             apiKey: "AIzaSyAActFtDrgVBq8wAOujPzETSDaU3nhtjhU",
             authDomain: "packian.firebaseapp.com",
@@ -444,6 +444,7 @@
             appId: "1:867004153848:web:44893f8e94afcb9d0ea00d",
             measurementId: "G-L89L3WDE18"
         };
+
         
         if (!firebase.apps.length) {
             firebase.initializeApp(firebaseConfig);
@@ -466,10 +467,11 @@
             return { r: "Mythical", x: "#f00" };
         }
 
-        // GENERATE 60 STANDARD PACK PRICES
+        // --- NEW SMOOTH ECONOMY PACK SCALING ---
+        // Generates 60 pack prices on a smooth polynomial curve from $50 to ~$2.5 Million
         const PACK_PRICES = [];
         for(let i=0; i<60; i++) {
-            PACK_PRICES.push(Math.floor(50 + (i*125) + Math.pow(i, 2.2)));
+            PACK_PRICES.push(Math.floor(50 + (250 * i) + (400 * Math.pow(i, 2)) + (5 * Math.pow(i, 3))));
         }
 
         // --- EXPLICIT 60 STANDARD PACKS WITH 360 REAL NAMES ---
@@ -537,9 +539,10 @@
         ];
 
         const STD_PACKS = PACK_DATA.map((p, i) => {
-            let baseVal = Math.max(10, PACK_PRICES[i] / 5);
+            // MASSSIVE BUFF TO SELL PRICES:
+            let baseVal = Math.max(25, Math.floor(PACK_PRICES[i] / 2.5)); 
             let colors = p.data.map((c, j) => {
-                let uniqueVal = Math.floor(baseVal * Math.pow(1.6, j) + (cId * 13) + 7);
+                let uniqueVal = Math.floor(baseVal * Math.pow(1.8, j) + (cId * 35) + 100);
                 let inst = { id: `C${cId++}`, name: c[0], hex: c[1], val: uniqueVal };
                 
                 POOL.std.push(inst); 
@@ -589,13 +592,11 @@
 
         const EV_PACKS = EV_RAW.map((p, i) => {
             let colors = p.d.map((c,j) => { 
-                let inst = { id: `C${cId++}`, name: c[0], hex: c[1], val: Math.floor(80000 * Math.pow(1.4, j) + cId*13) }; 
-                POOL.ev.push(inst); 
-                ALL_COLORS.set(inst.id, inst); 
-                POOL.high.push(inst); 
+                let inst = { id: `C${cId++}`, name: c[0], hex: c[1], val: Math.floor(150000 * Math.pow(1.5, j) + cId*25) }; 
+                POOL.ev.push(inst); ALL_COLORS.set(inst.id, inst); POOL.high.push(inst); 
                 return inst; 
             });
-            return { id: `E${i}`, name: p.n + " Pack", cost: 500000, colors: colors, isEvent: true };
+            return { id: `E${i}`, name: p.n + " Pack", cost: 1500000, colors: colors, isEvent: true };
         });
 
         // --- 24 ACTION ITEMS (Abilities) ---
@@ -604,10 +605,8 @@
         
         ABIL_NAMES.forEach((n, i) => {
             let abil = ABILITY_TYPES[i % ABILITY_TYPES.length];
-            let inst = { id: `C${cId++}`, name: `${n} Element`, hex: `#111111`, val: 500000 + (i*10000), ability: abil, isAction: true };
-            POOL.action.push(inst); 
-            ALL_COLORS.set(inst.id, inst); 
-            POOL.high.push(inst); 
+            let inst = { id: `C${cId++}`, name: `${n} Element`, hex: `#111111`, val: 1000000 + (i*50000), ability: abil, isAction: true };
+            POOL.action.push(inst); ALL_COLORS.set(inst.id, inst); POOL.high.push(inst); 
             
             // Safely inject rare chance into standard packs
             let targetPack = STD_PACKS[Math.floor(Math.random() * STD_PACKS.length)];
@@ -619,9 +618,7 @@
         // --- 2 NESTED PACKS (Packs as Items) ---
         const nPack1 = { id: `C${cId++}`, name: "Paradox Cache", hex: "#444444", val: 1000000, isNestedPack: true, poolId: 0 };
         const nPack2 = { id: `C${cId++}`, name: "Pandora's Box", hex: "#220000", val: 2000000, isNestedPack: true, poolId: 1 };
-        POOL.nested.push(nPack1, nPack2); 
-        ALL_COLORS.set(nPack1.id, nPack1); 
-        ALL_COLORS.set(nPack2.id, nPack2);
+        POOL.nested.push(nPack1, nPack2); ALL_COLORS.set(nPack1.id, nPack1); ALL_COLORS.set(nPack2.id, nPack2);
         POOL.high.push(nPack1, nPack2); 
         
         // Push securely to the last two standard packs without risking undefined arrays
@@ -644,20 +641,18 @@
         np2Prefix.forEach(p => np2Suffix.forEach(s => np2Names.push(`${p} ${s}`))); 
 
         np1Names.forEach((n, i) => {
-            let c1 = { id: `C${cId++}`, name: n, hex: `hsl(${i*12}, 50%, 50%)`, val: 250000 * (i+1) }; 
-            N_POOLS[0].push(c1); 
-            ALL_COLORS.set(c1.id, c1);
+            let c1 = { id: `C${cId++}`, name: n, hex: `hsl(${i*12}, 50%, 50%)`, val: 500000 * (i+1) }; 
+            N_POOLS[0].push(c1); ALL_COLORS.set(c1.id, c1);
         });
         
         np2Names.forEach((n, i) => {
-            let c2 = { id: `C${cId++}`, name: n, hex: `hsl(${i*12}, 100%, 20%)`, val: 350000 * (i+1) }; 
-            N_POOLS[1].push(c2); 
-            ALL_COLORS.set(c2.id, c2);
+            let c2 = { id: `C${cId++}`, name: n, hex: `hsl(${i*12}, 100%, 20%)`, val: 650000 * (i+1) }; 
+            N_POOLS[1].push(c2); ALL_COLORS.set(c2.id, c2);
         });
 
         // --- 2 SUPREME EXCLUSIVES ---
-        const exc1 = { id: `C${cId++}`, name: "Titanium White", hex: "#FFFFFF", val: 5000000 }; 
-        const exc2 = { id: `C${cId++}`, name: "Vantablack", hex: "#000000", val: 6000000 };
+        const exc1 = { id: `C${cId++}`, name: "Titanium White", hex: "#FFFFFF", val: 15000000 }; 
+        const exc2 = { id: `C${cId++}`, name: "Vantablack", hex: "#000000", val: 20000000 };
         POOL.exc.push(exc1, exc2); 
         ALL_COLORS.set(exc1.id, exc1); 
         ALL_COLORS.set(exc2.id, exc2);
@@ -668,12 +663,15 @@
         // 4. GAME STATE & CORE LOGIC
         // ==========================================
         let state = { 
-            name: "", code: null, isHost: false, status: 'setup', cash: 500, inv: [], dex: new Set(), 
+            name: "", code: null, isHost: false, status: 'setup', 
+            cash: 0, // STARTING CASH SET TO 0
+            inv: [], dex: new Set(), 
             endTime: 0, nextEv: 0, localAnomalies: [], evActive: false, players: {}, 
             freeReady: true, discountMod: 1, sellMod: 1, shield: false 
         };
         
         let subs = []; let loop; let pendingTradesCache = {}; let lastTradeSent = 0; let anomalyLock = false;
+
         function showScreen(id) { 
             document.querySelectorAll('.screen').forEach(s => s.classList.remove('active')); 
             let el = document.getElementById(id); 
@@ -810,7 +808,7 @@
                 case 7: state.shield = true; notifyCenter("AEGIS SHIELD: Protected from next steal.", "ACKNOWLEDGE"); break;
                 case 8: triggerPersonalEvent(true); break;
                 case 9: state.freeReady = true; renderStore(); notifyCenter("INITIATE CACHE REFRESHED INSTANTLY.", "GO"); break;
-                case 10: notifyCenter("OMNI-ZENITH 90% OFF", "ACKNOWLEDGE"); state.discountMod = 0.1; renderStore(); setTimeout(() => { state.discountMod = 1; renderStore(); }, 30000); break;
+                case 10: notifyCenter("OMNI-ZENITH 80% OFF", "ACKNOWLEDGE"); state.discountMod = 0.2; renderStore(); setTimeout(() => { state.discountMod = 1; renderStore(); }, 30000); break;
                 case 11: if(state.inv.length > 0) { state.inv.sort((a,b) => a.val - b.val); state.inv.shift(); syncInv(); notifyCenter("DECAY: Cheapest item destroyed.", "DISMISS"); } break;
                 case 12: if(state.inv.length > 0) { let best = [...state.inv].sort((a,b) => b.val - a.val)[0]; pushToInv(best); notifyCenter(`DUPLICATED: ${best.name}`, "SWEET"); } break;
                 case 13: if(Math.random() > 0.8) { let ex = POOL.exc[Math.floor(Math.random()*2)]; pushToInv(ex); notifyCenter(`JACKPOT: ${ex.name} Airdropped!`, "CLAIM"); } break;
@@ -892,7 +890,8 @@
                 g.appendChild(c);
             });
 
-            let omniCost = Math.floor(1000000 * state.discountMod);
+            // OMNI ZENITH SCALED TO $5,000,000
+            let omniCost = Math.floor(5000000 * state.discountMod);
             const btnZenith = document.createElement('div'); btnZenith.className = 'item-card'; btnZenith.style.borderColor = 'var(--gold)';
             btnZenith.innerHTML = `<h4 style="color:var(--gold); font-size:1rem;">OMNI-ZENITH</h4><p class="stat-val" style="color:var(--gold);">$${omniCost.toLocaleString()}</p><button style="margin-top:10px; width:100%;" class="btn-gold">PULL</button>`;
             btnZenith.querySelector('button').onclick = (e) => { 
