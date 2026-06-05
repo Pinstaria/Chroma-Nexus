@@ -674,6 +674,18 @@
         };
         
         let subs = []; let loop; let pendingTradesCache = {}; let lastTradeSent = 0; let anomalyLock = false;
+        function showScreen(id) { 
+            document.querySelectorAll('.screen').forEach(s => s.classList.remove('active')); 
+            let el = document.getElementById(id); 
+            if(el) el.classList.add('active'); 
+            sfx.click(); 
+        }
+
+        function closeOverlay(id) { 
+            let el = document.getElementById(id); 
+            if(el) el.style.display = 'none'; 
+            sfx.click(); 
+        }
 
         function hostGame() {
             try {
