@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>CHROMA NEXUS // V11.5 THE TIMESHIFT</title>
+    <title>CHROMA NEXUS // V11.6 THE TIMESHIFT</title>
     <link rel="icon" href="data:,">
     
     <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
@@ -531,11 +531,10 @@
 
     <div id="notification-hub"></div>
 
-    <!-- INITIALIZATION -->
     <div id="setup-screen" class="screen active" style="align-items: center; justify-content: center;">
         <div class="glass" style="width: 100%; max-width: 650px; text-align: center;">
             <h1 class="glow-cyan" style="font-size: 3.5rem; margin-bottom: 5px;">CHROMA NEXUS</h1>
-            <p style="color: #777; font-size: 1.1rem; margin-bottom: 25px;">SECURE SPECTRAL ECONOMY // V11.5 TIMESHIFT</p>
+            <p style="color: #777; font-size: 1.1rem; margin-bottom: 25px;">SECURE SPECTRAL ECONOMY // V11.6 TIMESHIFT</p>
             
             <input type="text" id="playerName" placeholder="ENTER ALIAS..." required style="text-align: center; font-size: 1.3rem; margin-bottom: 25px;">
             
@@ -555,7 +554,6 @@
         </div>
     </div>
 
-    <!-- LOBBY SCREEN -->
     <div id="lobby-screen" class="screen" style="align-items: center; justify-content: center;">
         <div class="glass" style="width: 100%; max-width: 600px; text-align: center;">
             <h2 class="glow-cyan" style="font-size: 2.5rem;">NODE LOBBY: <span id="lobby-code-display" class="glow-pink"></span></h2>
@@ -568,7 +566,6 @@
         </div>
     </div>
 
-    <!-- DASHBOARD -->
     <div id="game-screen" class="screen">
         <header id="hud" class="glass">
             <div style="display: flex; gap: 20px; align-items: center;">
@@ -597,7 +594,6 @@
             </div>
             
             <div class="hud-buttons">
-                <!-- CRAFTING BUTTON -->
                 <button onclick="openWorkshop()" class="btn-craft">WORKSHOP</button>
 
                 <button onclick="openTradeHub()">NETWORK</button>
@@ -635,14 +631,12 @@
                         <span style="color:#666"> / <span id="total-colors-count">868</span></span>
                     </div>
                 </div>
-                <!-- INVENTORY SEARCH FILTER -->
                 <input type="text" id="inv-search-input" placeholder="SEARCH INVENTORY..." onkeyup="filterInventory()" style="margin-bottom: 15px; border-color: #444; font-size: 0.9rem; padding: 8px;">
                 <div id="inventory-grid" class="pack-grid"></div>
             </div>
         </main>
     </div>
 
-    <!-- CORE OVERLAYS -->
     <div id="pack-overlay" class="overlay">
         <h2 id="pack-title" class="glow-cyan" style="font-size: 2.2rem;">DECRYPTING CACHE...</h2>
         <div id="pack-cards" class="drawn-container"></div>
@@ -680,7 +674,6 @@
         </div>
     </div>
     
-    <!-- DRAFT TRADE UI -->
     <div id="draft-overlay" class="overlay">
         <div class="modal" style="width: 1000px;">
             <h2 class="glow-cyan" style="text-align: center;">DRAFT TRANSMISSION TO: <span id="draft-target-name" class="glow-pink"></span></h2>
@@ -720,7 +713,6 @@
         </div>
     </div>
 
-    <!-- SYNTHESIS LAB MODAL -->
     <div id="synth-overlay" class="overlay">
         <div class="modal" style="width: 800px; text-align: center;">
             <div style="display: flex; justify-content: space-between; margin-bottom: 15px;">
@@ -749,7 +741,6 @@
         </div>
     </div>
 
-    <!-- WORKSHOP (CRAFTING 20 PACKS + 30 ANOMALY PACKS) -->
     <div id="craft-overlay" class="overlay">
         <div class="modal" style="width: 90%; max-width: 1100px;">
             <div style="display: flex; justify-content: space-between; margin-bottom: 15px;">
@@ -759,13 +750,11 @@
             <p style="color: #aaa; margin-bottom: 15px;">These are your personal, procedurally generated blueprint recipes. The required base colors are specifically bound to your Player DNA. Crafting consumes the ingredients.</p>
             
             <div style="display: flex; gap: 20px;">
-                <!-- CRAFTABLE PACKS COLUMN -->
                 <div class="glass" style="flex:1; border-color:var(--craft);">
                     <h3 style="color:var(--craft); margin-bottom:10px;">EXCLUSIVE PACKS (20 TIERS)</h3>
                     <div id="craft-packs-grid" style="display:grid; grid-template-columns: 1fr; gap:10px; max-height:50vh; overflow-y:auto; padding-right:5px;"></div>
                 </div>
                 
-                <!-- TIME-LOCKED ANOMALIES COLUMN -->
                 <div class="glass" style="flex:1; border-color:var(--pink);">
                     <h3 style="color:var(--pink); margin-bottom:10px;">
                         TIME-LOCKED ANOMALIES 
@@ -777,7 +766,6 @@
         </div>
     </div>
 
-    <!-- CASINO -->
     <div id="casino-overlay" class="overlay">
         <div class="modal" style="text-align: center; max-width: 450px;">
             <h2 style="color: #FF00FF; text-shadow: 0 0 10px #FF00FF;">COSMIC CASINO</h2>
@@ -787,7 +775,6 @@
         </div>
     </div>
 
-    <!-- EXPEDITION -->
     <div id="expedition-overlay" class="overlay">
         <div class="modal" style="text-align: center; max-width: 450px;">
             <h2 style="color: #00FFFF; text-shadow: 0 0 10px #00FFFF;">DEEP SPACE EXPEDITION</h2>
@@ -797,7 +784,6 @@
         </div>
     </div>
 
-    <!-- BLACK MARKET -->
     <div id="bm-overlay" class="overlay">
         <div class="modal" style="width: 700px; text-align: center;">
             <div style="display: flex; justify-content: space-between; margin-bottom: 15px;">
@@ -809,7 +795,6 @@
         </div>
     </div>
 
-    <!-- THE RIFT -->
     <div id="rift-overlay" class="overlay">
         <div class="modal" style="text-align: center; max-width: 450px;">
             <h2 class="glow-void">THE VOID RIFT</h2>
@@ -820,7 +805,6 @@
         </div>
     </div>
 
-    <!-- GLOBAL DEX MODAL -->
     <div id="dex-overlay" class="overlay">
         <div class="modal" style="width: 95%;">
             <div style="display: flex; justify-content: space-between; margin-bottom: 15px;">
@@ -1109,7 +1093,6 @@
                 return inst; 
             });
             
-            // V11.5: Anomaly Packs are now fully registered items so they can be crafted
             let packItem = { 
                 id: `P_EV_${i}`, 
                 name: p.n + " Pack", 
@@ -1356,23 +1339,39 @@
         });
         
         // ==========================================
-        // V11.0 WORKSHOP CRAFTING PACKS (20)
+        // V11.6 WORKSHOP CRAFTING PACKS (20)
+        // Handcrafted names for every item inside!
         // ==========================================
-        const CRAFT_PACK_NAMES = [
-            "Apprentice Pack", "Novice Pack", "Journeyman Pack", "Tinkerer Pack", 
-            "Artisan Pack", "Fabricator Pack", "Engineer Pack", "Architect Pack", 
-            "Pioneer Pack", "Creator Pack", "Innovator Pack", "Master Pack", 
-            "Grandmaster Pack", "Visionary Pack", "Luminary Pack", "Virtuoso Pack", 
-            "Oracle Pack", "Genesis Pack", "Celestial Pack", "Ascendant Pack"
+        const CRAFT_PACK_DATA = [
+            { n: "Apprentice Pack", d: ["Apprentice Spark", "Apprentice Cinder", "Apprentice Pebble", "Apprentice Twig", "Apprentice Droplet", "Apprentice Breeze"] },
+            { n: "Novice Pack", d: ["Novice Flame", "Novice Ember", "Novice Stone", "Novice Branch", "Novice Ripple", "Novice Gust"] },
+            { n: "Journeyman Pack", d: ["Journeyman Blaze", "Journeyman Coal", "Journeyman Rock", "Journeyman Timber", "Journeyman Wave", "Journeyman Wind"] },
+            { n: "Tinkerer Pack", d: ["Tinkerer Gear", "Tinkerer Sprocket", "Tinkerer Spring", "Tinkerer Cog", "Tinkerer Widget", "Tinkerer Pulley"] },
+            { n: "Artisan Pack", d: ["Artisan Canvas", "Artisan Marble", "Artisan Clay", "Artisan Glass", "Artisan Silk", "Artisan Pigment"] },
+            { n: "Fabricator Pack", d: ["Fabricator Steel", "Fabricator Copper", "Fabricator Iron", "Fabricator Brass", "Fabricator Bronze", "Fabricator Tin"] },
+            { n: "Engineer Pack", d: ["Engineer Circuit", "Engineer Battery", "Engineer Sensor", "Engineer Diode", "Engineer Engine", "Engineer Processor"] },
+            { n: "Architect Pack", d: ["Architect Foundation", "Architect Pillar", "Architect Keystone", "Architect Arch", "Architect Vault", "Architect Spire"] },
+            { n: "Pioneer Pack", d: ["Pioneer Frontier", "Pioneer Discovery", "Pioneer Pathfinder", "Pioneer Horizon", "Pioneer Trek", "Pioneer Journey"] },
+            { n: "Creator Pack", d: ["Creator Spark", "Creator Genesis", "Creator Origin", "Creator Breath", "Creator Dawn", "Creator Prime"] },
+            { n: "Innovator Pack", d: ["Innovator Paradigm", "Innovator Breakthrough", "Innovator Novelty", "Innovator Prototype", "Innovator Eureka", "Innovator Ingenuity"] },
+            { n: "Master Pack", d: ["Masterwork", "Master Opus", "Master Pinnacle", "Master Apex", "Master Paragon", "Master Zenith"] },
+            { n: "Grandmaster Pack", d: ["Grand Legacy", "Sage Wisdom", "Elder Knowledge", "Sovereign Power", "Exalted Light", "Venerable Aura"] },
+            { n: "Visionary Pack", d: ["Visionary Prophecy", "Visionary Foresight", "Visionary Omen", "Visionary Oracle", "Visionary Dream", "Visionary Sight"] },
+            { n: "Luminary Pack", d: ["Luminary Beam", "Luminary Flash", "Luminary Glow", "Luminary Aura", "Luminary Spark", "Luminary Ray"] },
+            { n: "Virtuoso Pack", d: ["Virtuoso Maestro", "Virtuoso Prodigy", "Virtuoso Genius", "Virtuoso Talent", "Virtuoso Savant", "Virtuoso Expert"] },
+            { n: "Oracle Pack", d: ["Oracle Eye", "Oracle Stone", "Oracle Card", "Oracle Rune", "Oracle Crystal", "Oracle Pool"] },
+            { n: "Genesis Pack", d: ["Genesis Bang", "Genesis Dust", "Genesis Ooze", "Genesis Alpha", "Genesis Proto", "Genesis First"] },
+            { n: "Celestial Pack", d: ["Celestial Gate", "Celestial Wing", "Celestial Halo", "Celestial Flame", "Celestial Light", "Celestial Ray"] },
+            { n: "Ascendant Pack", d: ["Ascendant Shift", "Ascendant Transcend", "Ascendant Evolve", "Ascendant Apotheosis", "Ascendant Epiphany", "Ascendant Nirvana"] }
         ];
         
-        CRAFT_PACK_NAMES.forEach((n, i) => {
+        CRAFT_PACK_DATA.forEach((pack, i) => {
             let packCols = [];
             
             for(let j=0; j<6; j++) {
                 let inst = { 
                     id: `C${cId++}`, 
-                    name: `${n.split(" ")[0]} Element ${j+1}`, 
+                    name: pack.d[j], 
                     hex: `hsl(${i*18}, 90%, ${30+j*10}%)`, 
                     val: Math.floor(250000 * Math.pow(1.5, i) * Math.pow(1.5, j)) 
                 };
@@ -1382,7 +1381,7 @@
             
             let packItem = { 
                 id: `C${cId++}`, 
-                name: n, 
+                name: pack.n, 
                 hex: `hsl(${i*18}, 100%, 50%)`, 
                 val: Math.floor(1000000 * Math.pow(1.4, i)), 
                 isNestedPack: true, 
@@ -1421,7 +1420,7 @@
             xp: 0,
             recipesGenerated: false, 
             recipes: [],
-            wasSecondHalf: false // V11.5 Tracker
+            wasSecondHalf: false 
         };
         
         let subs = []; 
@@ -1641,7 +1640,7 @@
             }, 1000);
         }
 
-        // --- V11.5 CRAFTING WORKSHOP WITH TIME-LOCKED ANOMALIES ---
+        // --- V11.6 CRAFTING WORKSHOP WITH TIME-LOCKED ANOMALIES ---
         function pseudoRandomGenerator(seedString) {
             let hash = 0;
             for (let i = 0; i < seedString.length; i++) {
@@ -1781,7 +1780,6 @@
 
             state.recipes.forEach((rec, idx) => {
                 if (rec.type === 'anomaly') {
-                    // Time-locked filtering logic
                     if (!isSecondHalf && rec.anomalyIndex >= 15) return;
                     if (isSecondHalf && rec.anomalyIndex < 15) return;
                 }
@@ -2322,7 +2320,6 @@
                 he.innerText = f(ev);
             }
             
-            // Check for Halfway shift
             if(state.status === 'active' && state.startTime > 0) {
                 let isSecondHalf = (Date.now() - state.startTime) >= (state.endTime - state.startTime) / 2;
                 if (state.wasSecondHalf !== isSecondHalf) {
@@ -2663,7 +2660,6 @@
                         sfx.buy(); 
                         updateCash(-cost); 
                         if(p.isEvent) {
-                            // Buying anomaly from store immediately opens its contents
                             processWeightedDraw(p.colors);
                         } else {
                             processWeightedDraw(p.colors); 
