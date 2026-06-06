@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>CHROMA NEXUS // V10.0 THE BLUEPRINT</title>
+    <title>CHROMA NEXUS // V11.5 THE TIMESHIFT</title>
     <link rel="icon" href="data:,">
     
     <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
@@ -108,35 +108,55 @@
             cursor: not-allowed; 
         }
         
-        button.btn-pink { border-color: var(--pink); color: var(--pink); } 
+        button.btn-pink { 
+            border-color: var(--pink); 
+            color: var(--pink); 
+        } 
+        
         button.btn-pink:hover:not(:disabled) { 
             background: var(--pink); 
             color: #fff; 
             box-shadow: 0 0 15px var(--pink); 
         }
         
-        button.btn-gold { border-color: var(--gold); color: var(--gold); } 
+        button.btn-gold { 
+            border-color: var(--gold); 
+            color: var(--gold); 
+        } 
+        
         button.btn-gold:hover:not(:disabled) { 
             background: var(--gold); 
             color: #000; 
             box-shadow: 0 0 15px var(--gold); 
         }
         
-        button.btn-synth { border-color: var(--synth); color: var(--synth); } 
+        button.btn-synth { 
+            border-color: var(--synth); 
+            color: var(--synth); 
+        } 
+        
         button.btn-synth:hover:not(:disabled) { 
             background: var(--synth); 
             color: #fff; 
             box-shadow: 0 0 15px var(--synth); 
         }
         
-        button.btn-void { border-color: var(--void); color: var(--void); } 
+        button.btn-void { 
+            border-color: var(--void); 
+            color: var(--void); 
+        } 
+        
         button.btn-void:hover:not(:disabled) { 
             background: var(--void); 
             color: #fff; 
             box-shadow: 0 0 15px var(--void); 
         }
 
-        button.btn-craft { border-color: var(--craft); color: var(--craft); } 
+        button.btn-craft { 
+            border-color: var(--craft); 
+            color: var(--craft); 
+        } 
+        
         button.btn-craft:hover:not(:disabled) { 
             background: var(--craft); 
             color: #000; 
@@ -515,7 +535,7 @@
     <div id="setup-screen" class="screen active" style="align-items: center; justify-content: center;">
         <div class="glass" style="width: 100%; max-width: 650px; text-align: center;">
             <h1 class="glow-cyan" style="font-size: 3.5rem; margin-bottom: 5px;">CHROMA NEXUS</h1>
-            <p style="color: #777; font-size: 1.1rem; margin-bottom: 25px;">SECURE SPECTRAL ECONOMY // V10.0</p>
+            <p style="color: #777; font-size: 1.1rem; margin-bottom: 25px;">SECURE SPECTRAL ECONOMY // V11.5 TIMESHIFT</p>
             
             <input type="text" id="playerName" placeholder="ENTER ALIAS..." required style="text-align: center; font-size: 1.3rem; margin-bottom: 25px;">
             
@@ -577,7 +597,7 @@
             </div>
             
             <div class="hud-buttons">
-                <!-- V10.0 NEW BUTTON: CRAFTING -->
+                <!-- CRAFTING BUTTON -->
                 <button onclick="openWorkshop()" class="btn-craft">WORKSHOP</button>
 
                 <button onclick="openTradeHub()">NETWORK</button>
@@ -612,7 +632,7 @@
                     <div style="text-align: right;">
                         <span class="stat-label">Currently Held Uniques</span><br>
                         <span id="unique-count" class="stat-val glow-cyan">0</span>
-                        <span style="color:#666"> / <span id="total-colors-count">728</span></span>
+                        <span style="color:#666"> / <span id="total-colors-count">868</span></span>
                     </div>
                 </div>
                 <!-- INVENTORY SEARCH FILTER -->
@@ -700,7 +720,7 @@
         </div>
     </div>
 
-    <!-- SYNTHESIS LAB MODAL (Equivalent Exchange) -->
+    <!-- SYNTHESIS LAB MODAL -->
     <div id="synth-overlay" class="overlay">
         <div class="modal" style="width: 800px; text-align: center;">
             <div style="display: flex; justify-content: space-between; margin-bottom: 15px;">
@@ -729,23 +749,29 @@
         </div>
     </div>
 
-    <!-- WORKSHOP (CRAFTING) -->
+    <!-- WORKSHOP (CRAFTING 20 PACKS + 30 ANOMALY PACKS) -->
     <div id="craft-overlay" class="overlay">
         <div class="modal" style="width: 90%; max-width: 1100px;">
             <div style="display: flex; justify-content: space-between; margin-bottom: 15px;">
                 <h2 class="glow-craft">THE WORKSHOP (BLUEPRINTS)</h2>
                 <button onclick="closeOverlay('craft-overlay')">X</button>
             </div>
-            <p style="color: #aaa; margin-bottom: 15px;">These are your personal, procedurally generated blueprints. The required base colors are specifically bound to your Player DNA. You must hunt for these specific combinations via the Async Trading Hub. Crafting consumes the ingredients.</p>
+            <p style="color: #aaa; margin-bottom: 15px;">These are your personal, procedurally generated blueprint recipes. The required base colors are specifically bound to your Player DNA. Crafting consumes the ingredients.</p>
             
             <div style="display: flex; gap: 20px;">
-                <div class="glass" style="flex:1;">
-                    <h3 style="color:var(--cyan); margin-bottom:10px;">CRAFTABLE ITEMS</h3>
-                    <div id="craft-recipes-grid" style="display:flex; flex-direction:column; gap:10px; max-height:400px; overflow-y:auto; padding-right:5px;"></div>
+                <!-- CRAFTABLE PACKS COLUMN -->
+                <div class="glass" style="flex:1; border-color:var(--craft);">
+                    <h3 style="color:var(--craft); margin-bottom:10px;">EXCLUSIVE PACKS (20 TIERS)</h3>
+                    <div id="craft-packs-grid" style="display:grid; grid-template-columns: 1fr; gap:10px; max-height:50vh; overflow-y:auto; padding-right:5px;"></div>
                 </div>
+                
+                <!-- TIME-LOCKED ANOMALIES COLUMN -->
                 <div class="glass" style="flex:1; border-color:var(--pink);">
-                    <h3 style="color:var(--pink); margin-bottom:10px;">CRAFTABLE PACKS</h3>
-                    <div id="craft-packs-grid" style="display:flex; flex-direction:column; gap:10px; max-height:400px; overflow-y:auto; padding-right:5px;"></div>
+                    <h3 style="color:var(--pink); margin-bottom:10px;">
+                        TIME-LOCKED ANOMALIES 
+                        <span style="font-size:0.8rem; color:#aaa; float:right;" id="anomaly-phase-text">PHASE 1 ACTIVE</span>
+                    </h3>
+                    <div id="craft-anomaly-grid" style="display:grid; grid-template-columns: 1fr; gap:10px; max-height:50vh; overflow-y:auto; padding-right:5px;"></div>
                 </div>
             </div>
         </div>
@@ -803,7 +829,7 @@
             </div>
             <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px;">
                 <p id="dex-info" style="font-size: 1.4rem; color: var(--gold); margin:0;">
-                    UNIQUE SPECTRUM OWNED: <span id="dex-owned-text-header">0/728</span>
+                    UNIQUE SPECTRUM OWNED: <span id="dex-owned-text-header">0/868</span>
                 </p>
                 <input type="text" id="dex-search-input" placeholder="SEARCH SPECTRUM..." onkeyup="filterDex()" style="width: 300px; padding: 8px;">
             </div>
@@ -903,6 +929,7 @@
             appId: "1:867004153848:web:44893f8e94afcb9d0ea00d",
             measurementId: "G-L89L3WDE18"
         };
+        
         if (!firebase.apps.length) { 
             firebase.initializeApp(firebaseConfig); 
         }
@@ -910,13 +937,13 @@
         const db = firebase.firestore();
 
         // ==========================================
-        // 3. DATA ARCHITECTURE: 728 TOTAL ITEMS
+        // 3. DATA ARCHITECTURE: 868 TOTAL ITEMS
         // ==========================================
         let cId = 1; 
         const ALL_COLORS = new Map(); 
         const POOL = { 
             std: [], ev: [], exc: [], free: [], high: [], action: [], nested: [], 
-            synthOut: [], casino: [], relics: [], contraband: [], rift: [], craftColors: [], craftPacks: []
+            synthOut: [], casino: [], relics: [], contraband: [], rift: [], craftPacks: []
         };
         
         function getTierInfo(val) {
@@ -1082,13 +1109,22 @@
                 return inst; 
             });
             
-            return { 
-                id: `E${i}`, 
+            // V11.5: Anomaly Packs are now fully registered items so they can be crafted
+            let packItem = { 
+                id: `P_EV_${i}`, 
                 name: p.n + " Pack", 
+                hex: "#FF00FF", 
+                val: 1500000, 
                 cost: 1500000, 
                 colors: colors, 
-                isEvent: true 
+                isEvent: true,
+                isNestedPack: true, 
+                nestedColors: colors
             };
+            
+            ALL_COLORS.set(packItem.id, packItem);
+            
+            return packItem;
         });
 
         // --- 24 ACTION ITEMS (Abilities) ---
@@ -1319,30 +1355,15 @@
             ALL_COLORS.set(c.id, c); 
         });
         
-        // --- V10.0 CRAFTING EXCLUSIVES (30) ---
-        const CRAFT_COLOR_NAMES = [
-            "Forged Ember", "Tempered Azure", "Quenched Jade", "Cast Iron Black", 
-            "Welded Gold", "Smelted Ruby", "Galvanized Silver", "Annealed Copper", 
-            "Alloyed Bronze", "Refined Platinum", "Synthesized Opal", "Machined Amethyst", 
-            "Constructed Quartz", "Fabricated Topaz", "Assembled Emerald", "Engineered Sapphire", 
-            "Manufactured Diamond", "Architected Onyx", "Programmed Pearl", "Coded Obsidian"
-        ];
-        
-        CRAFT_COLOR_NAMES.forEach((n, i) => {
-            let c = { 
-                id: `C${cId++}`, 
-                name: n, 
-                hex: `hsl(${i*18}, 50%, 40%)`, 
-                val: 3000000 + (i*250000) 
-            };
-            POOL.craftColors.push(c);
-            ALL_COLORS.set(c.id, c);
-        });
-
+        // ==========================================
+        // V11.0 WORKSHOP CRAFTING PACKS (20)
+        // ==========================================
         const CRAFT_PACK_NAMES = [
-            "Architect Pack", "Engineer Pack", "Creator Pack", "Innovator Pack", 
-            "Fabricator Pack", "Artisan Pack", "Master Pack", "Grandmaster Pack", 
-            "Pioneer Pack", "Visionary Pack"
+            "Apprentice Pack", "Novice Pack", "Journeyman Pack", "Tinkerer Pack", 
+            "Artisan Pack", "Fabricator Pack", "Engineer Pack", "Architect Pack", 
+            "Pioneer Pack", "Creator Pack", "Innovator Pack", "Master Pack", 
+            "Grandmaster Pack", "Visionary Pack", "Luminary Pack", "Virtuoso Pack", 
+            "Oracle Pack", "Genesis Pack", "Celestial Pack", "Ascendant Pack"
         ];
         
         CRAFT_PACK_NAMES.forEach((n, i) => {
@@ -1352,8 +1373,8 @@
                 let inst = { 
                     id: `C${cId++}`, 
                     name: `${n.split(" ")[0]} Element ${j+1}`, 
-                    hex: `hsl(${i*36}, 90%, ${30+j*10}%)`, 
-                    val: 1000000 * Math.pow(1.5, j) 
+                    hex: `hsl(${i*18}, 90%, ${30+j*10}%)`, 
+                    val: Math.floor(250000 * Math.pow(1.5, i) * Math.pow(1.5, j)) 
                 };
                 ALL_COLORS.set(inst.id, inst);
                 packCols.push(inst);
@@ -1362,8 +1383,8 @@
             let packItem = { 
                 id: `C${cId++}`, 
                 name: n, 
-                hex: `hsl(${i*36}, 100%, 50%)`, 
-                val: 5000000 + (i*1000000), 
+                hex: `hsl(${i*18}, 100%, 50%)`, 
+                val: Math.floor(1000000 * Math.pow(1.4, i)), 
                 isNestedPack: true, 
                 isCraftPack: true, 
                 nestedColors: packCols 
@@ -1373,7 +1394,7 @@
             ALL_COLORS.set(packItem.id, packItem);
         });
 
-        const TOTAL_COLORS = ALL_COLORS.size; // EXACTLY 728 ITEMS
+        const TOTAL_COLORS = ALL_COLORS.size; // EXACTLY 868 ITEMS
 
         // ==========================================
         // GAME STATE & CORE LOGIC
@@ -1386,6 +1407,7 @@
             cash: 0, 
             inv: [], 
             dex: new Set(), 
+            startTime: 0,
             endTime: 0, 
             nextEv: 0, 
             localAnomalies: [], 
@@ -1398,7 +1420,8 @@
             lvl: 1, 
             xp: 0,
             recipesGenerated: false, 
-            recipes: [] 
+            recipes: [],
+            wasSecondHalf: false // V11.5 Tracker
         };
         
         let subs = []; 
@@ -1495,7 +1518,7 @@
             }
         }
 
-        // --- V10.0 SYNTHESIS LAB (EQUIVALENT EXCHANGE ANTI-EXPLOIT) ---
+        // --- SYNTHESIS LAB (EQUIVALENT EXCHANGE ANTI-EXPLOIT) ---
         function openSynthLab() { 
             let ov = document.getElementById('synth-overlay'); 
             if(ov) { 
@@ -1594,25 +1617,20 @@
             sfx.synth(); 
             closeOverlay('synth-overlay');
             
-            // ANTI EXPLOIT: Output bounds based on total sacrifice value
             let c;
             
             if (totalVal < 100000) {
-                // Garbage in, garbage out. Random standard free tier.
                 c = POOL.free[Math.floor(Math.random() * POOL.free.length)];
             } else if (totalVal < 1000000) {
-                // Mid tier. Might get an action item or rare standard.
                 if (Math.random() > 0.5) {
                     c = POOL.action[Math.floor(Math.random() * POOL.action.length)];
                 } else {
                     c = POOL.std[Math.floor(Math.random() * POOL.std.length)];
                 }
             } else if (totalVal < 5000000) {
-                // High tier. Better action items, high standards, or cheap anomalies
                 let highPools = [...POOL.action, ...POOL.ev, ...POOL.high];
                 c = highPools[Math.floor(Math.random() * highPools.length)];
             } else {
-                // Premium. 5 Million+ sacrifice unlocks Synth Exclusives
                 c = POOL.synthOut[Math.floor(Math.random() * POOL.synthOut.length)];
             }
             
@@ -1623,7 +1641,7 @@
             }, 1000);
         }
 
-        // --- V10.0 CRAFTING WORKSHOP ---
+        // --- V11.5 CRAFTING WORKSHOP WITH TIME-LOCKED ANOMALIES ---
         function pseudoRandomGenerator(seedString) {
             let hash = 0;
             for (let i = 0; i < seedString.length; i++) {
@@ -1643,24 +1661,72 @@
             let rng = pseudoRandomGenerator(state.name + state.code);
             state.recipes = [];
             
-            // Generate 30 unique recipes (1 for each Craft color/pack)
-            let allCraftables = [...POOL.craftColors, ...POOL.craftPacks];
-            
-            allCraftables.forEach(item => {
+            let easyStd = POOL.std.slice(0, 180); 
+            let hardStd = POOL.std.slice(180, 360); 
+            let mixedRare = [...POOL.relics, ...POOL.casino, ...POOL.contraband];
+
+            // 1. Generate 20 Craft Packs
+            POOL.craftPacks.forEach((item, i) => {
                 let reqs = [];
-                for(let i=0; i<3; i++) {
-                    // Pick random ingredient from standard pool based on seed
-                    let pick = POOL.std[rng() % POOL.std.length];
+                let poolsToDraw = [];
+
+                if (i < 5) {
+                    poolsToDraw = [easyStd, easyStd, easyStd];
+                } else if (i < 10) {
+                    poolsToDraw = [easyStd, easyStd, hardStd];
+                } else if (i < 14) {
+                    poolsToDraw = [easyStd, hardStd, hardStd];
+                } else if (i < 17) {
+                    poolsToDraw = [hardStd, hardStd, POOL.ev];
+                } else if (i < 19) {
+                    poolsToDraw = [hardStd, POOL.ev, mixedRare];
+                } else {
+                    poolsToDraw = [POOL.ev, POOL.rift, POOL.synthOut];
+                }
+
+                poolsToDraw.forEach(pool => {
+                    let pick = pool[rng() % pool.length];
                     reqs.push({ 
                         id: pick.id, 
                         name: pick.name, 
                         hex: pick.hex 
                     });
-                }
+                });
+
                 state.recipes.push({ 
                     resultId: item.id, 
                     reqs: reqs, 
-                    isPack: item.isCraftPack || false 
+                    type: 'pack' 
+                });
+            });
+            
+            // 2. Generate 30 Anomaly Packs for Crafting
+            EV_PACKS.forEach((item, i) => {
+                let reqs = [];
+                
+                reqs.push({ 
+                    id: hardStd[rng() % hardStd.length].id, 
+                    name: hardStd[rng() % hardStd.length].name, 
+                    hex: hardStd[rng() % hardStd.length].hex 
+                });
+                
+                reqs.push({ 
+                    id: hardStd[rng() % hardStd.length].id, 
+                    name: hardStd[rng() % hardStd.length].name, 
+                    hex: hardStd[rng() % hardStd.length].hex 
+                });
+                
+                reqs.push({ 
+                    id: mixedRare[rng() % mixedRare.length].id, 
+                    name: mixedRare[rng() % mixedRare.length].name, 
+                    hex: mixedRare[rng() % mixedRare.length].hex 
+                });
+                
+                state.recipes.push({ 
+                    resultId: item.id, 
+                    reqs: reqs, 
+                    type: 'anomaly', 
+                    anomalyIndex: i 
                 });
             });
             
@@ -1692,17 +1758,37 @@
         }
 
         function renderWorkshop() {
-            let colGrid = document.getElementById('craft-recipes-grid');
-            let packGrid = document.getElementById('craft-packs-grid');
+            let isSecondHalf = false;
             
-            colGrid.innerHTML = ''; 
-            packGrid.innerHTML = '';
+            if (state.startTime && state.endTime) {
+                let elapsed = Date.now() - state.startTime;
+                let dur = state.endTime - state.startTime;
+                if (dur > 0 && elapsed >= dur / 2) {
+                    isSecondHalf = true;
+                }
+            }
+            
+            let phaseText = document.getElementById('anomaly-phase-text');
+            if(phaseText) {
+                phaseText.innerText = isSecondHalf ? "PHASE 2 ACTIVE (PACKS 16-30)" : "PHASE 1 ACTIVE (PACKS 1-15)";
+            }
+            
+            let packGrid = document.getElementById('craft-packs-grid');
+            let anomalyGrid = document.getElementById('craft-anomaly-grid');
+            
+            if(packGrid) packGrid.innerHTML = ''; 
+            if(anomalyGrid) anomalyGrid.innerHTML = '';
 
             state.recipes.forEach((rec, idx) => {
+                if (rec.type === 'anomaly') {
+                    // Time-locked filtering logic
+                    if (!isSecondHalf && rec.anomalyIndex >= 15) return;
+                    if (isSecondHalf && rec.anomalyIndex < 15) return;
+                }
+                
                 let resItem = ALL_COLORS.get(rec.resultId);
                 let tier = getTierInfo(resItem.val);
                 
-                // Check if user has ingredients
                 let has1 = state.inv.findIndex(i => i.id === rec.reqs[0].id) > -1;
                 let has2 = state.inv.findIndex(i => i.id === rec.reqs[1].id) > -1;
                 let has3 = state.inv.findIndex(i => i.id === rec.reqs[2].id) > -1;
@@ -1725,10 +1811,10 @@
                     <button class="btn-craft" style="padding: 10px 20px;" ${!canCraft ? 'disabled' : ''} onclick="executeCraft(${idx})">CRAFT</button>
                 `;
                 
-                if(rec.isPack) {
+                if(rec.type === 'pack' && packGrid) {
                     packGrid.appendChild(div);
-                } else {
-                    colGrid.appendChild(div);
+                } else if(rec.type === 'anomaly' && anomalyGrid) {
+                    anomalyGrid.appendChild(div);
                 }
             });
         }
@@ -1737,7 +1823,6 @@
             let rec = state.recipes[idx];
             let resItem = ALL_COLORS.get(rec.resultId);
             
-            // Consume ingredients
             let rm1 = false, rm2 = false, rm3 = false;
             let toRemove = [];
             
@@ -1775,7 +1860,7 @@
             }
         }
 
-        // --- V9.0 MULTIVERSE MECHANICS ---
+        // --- MULTIVERSE MECHANICS ---
         function openCasino() { 
             closeOverlay('hub-overlay'); 
             closeOverlay('draft-overlay'); 
@@ -2083,6 +2168,7 @@
                     }
                 } else if(d.status === 'active' && state.status !== 'active') {
                     state.status = 'active'; 
+                    state.startTime = d.start;
                     state.endTime = d.end; 
                     state.nextEv = d.nextEv; 
                     
@@ -2106,10 +2192,12 @@
                     refreshBounty(); 
                     generateUniqueRecipes(); 
                     renderStore(); 
+                    
                     loop = setInterval(gameLoop, 1000);
                 }
                 
                 if(d.status === 'active') { 
+                    state.startTime = d.start;
                     state.endTime = d.end; 
                     state.nextEv = d.nextEv; 
                 }
@@ -2208,6 +2296,7 @@
             
             db.collection('games').doc(state.code).update({ 
                 status: 'active', 
+                start: now,
                 end: end, 
                 nextEv: next 
             });
@@ -2233,6 +2322,17 @@
                 he.innerText = f(ev);
             }
             
+            // Check for Halfway shift
+            if(state.status === 'active' && state.startTime > 0) {
+                let isSecondHalf = (Date.now() - state.startTime) >= (state.endTime - state.startTime) / 2;
+                if (state.wasSecondHalf !== isSecondHalf) {
+                    state.wasSecondHalf = isSecondHalf;
+                    if(document.getElementById('craft-overlay').style.display === 'flex') {
+                        renderWorkshop();
+                    }
+                }
+            }
+
             if(left === 0 && state.isHost && state.code) {
                 db.collection('games').doc(state.code).update({status: 'ended'});
             }
@@ -2434,9 +2534,9 @@
                 state.inv.splice(idx,1); 
                 syncInv(); 
                 
-                if(item.isCraftPack) { 
+                if(item.nestedColors) { 
                     processWeightedDraw(item.nestedColors); 
-                } else { 
+                } else if(item.poolId !== undefined) { 
                     processWeightedDraw(N_POOLS[item.poolId]); 
                 }
                 return; 
@@ -2508,7 +2608,7 @@
         }
 
         // ==========================================
-        // 7. STORE & INVENTORY CORE (V10.0 Updated Search Filters)
+        // 7. STORE & INVENTORY CORE
         // ==========================================
         function renderStore() {
             const g = document.getElementById('store-grid'); 
@@ -2562,7 +2662,12 @@
                     if(state.cash >= cost) { 
                         sfx.buy(); 
                         updateCash(-cost); 
-                        processWeightedDraw(p.colors); 
+                        if(p.isEvent) {
+                            // Buying anomaly from store immediately opens its contents
+                            processWeightedDraw(p.colors);
+                        } else {
+                            processWeightedDraw(p.colors); 
+                        }
                     } else { 
                         notifyCenter("INSUFFICIENT FUNDS", "DISMISS"); 
                         sfx.alert(); 
@@ -2685,7 +2790,6 @@
             syncDB(); 
         }
 
-        // V10.0 INVENTORY SEARCH
         function filterInventory() {
             let searchInput = document.getElementById('inv-search-input');
             let q = searchInput ? searchInput.value.toUpperCase() : "";
@@ -2772,7 +2876,7 @@
         }
 
         // ==========================================
-        // 8. ASYNC TRADING (V10.0 Live Search Filtering)
+        // 8. ASYNC TRADING 
         // ==========================================
         let draftTarget = ""; 
         let draftOffer = { cash: 0, cols: [] }; 
@@ -3144,7 +3248,7 @@
         }
 
         // ==========================================
-        // 9. GLOBAL DEX (V10.0 Live Search Filtering)
+        // 9. GLOBAL DEX
         // ==========================================
         function openGlobalDex() { 
             const m = document.getElementById('dex-overlay'); 
