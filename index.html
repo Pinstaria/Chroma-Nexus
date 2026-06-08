@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>CHROMA NEXUS // V13.1 ERROR-TRACKED</title>
+    <title>CHROMA NEXUS // V13.2 FULL REPAIR</title>
     <link rel="icon" href="data:,">
     
     <script>
@@ -128,16 +128,22 @@
         
         button.btn-pink { border-color: var(--pink); color: var(--pink); } 
         button.btn-pink:hover:not(:disabled) { background: var(--pink); color: #fff; box-shadow: 0 0 15px var(--pink); }
+        
         button.btn-gold { border-color: var(--gold); color: var(--gold); } 
         button.btn-gold:hover:not(:disabled) { background: var(--gold); color: #000; box-shadow: 0 0 15px var(--gold); }
+        
         button.btn-synth { border-color: var(--synth); color: var(--synth); } 
         button.btn-synth:hover:not(:disabled) { background: var(--synth); color: #fff; box-shadow: 0 0 15px var(--synth); }
+        
         button.btn-void { border-color: var(--void); color: var(--void); } 
         button.btn-void:hover:not(:disabled) { background: var(--void); color: #fff; box-shadow: 0 0 15px var(--void); }
+
         button.btn-craft { border-color: var(--craft); color: var(--craft); } 
         button.btn-craft:hover:not(:disabled) { background: var(--craft); color: #000; box-shadow: 0 0 15px var(--craft); }
+
         button.btn-bank { border-color: var(--bank); color: var(--bank); } 
         button.btn-bank:hover:not(:disabled) { background: var(--bank); color: #000; box-shadow: 0 0 15px var(--bank); }
+
         button.btn-hack { border-color: var(--hack); color: var(--hack); } 
         button.btn-hack:hover:not(:disabled) { background: var(--hack); color: #000; box-shadow: 0 0 15px var(--hack); }
         
@@ -521,7 +527,7 @@
     <div id="setup-screen" class="screen active" style="align-items: center; justify-content: center;">
         <div class="glass" style="width: 100%; max-width: 650px; text-align: center;">
             <h1 class="glow-cyan" style="font-size: 3.5rem; margin-bottom: 5px;">CHROMA NEXUS</h1>
-            <p style="color: #777; font-size: 1.1rem; margin-bottom: 25px;">SECURE SPECTRAL ECONOMY // V13.1</p>
+            <p style="color: #777; font-size: 1.1rem; margin-bottom: 25px;">SECURE SPECTRAL ECONOMY // V13.2</p>
             
             <input type="text" id="playerName" placeholder="ENTER ALIAS..." required style="text-align: center; font-size: 1.3rem; margin-bottom: 25px;">
             
@@ -897,7 +903,7 @@
 
     <script>
         // ==========================================
-        // AUDIO INITIALIZATION
+        // 1. AUDIO INITIALIZATION
         // ==========================================
         const actx = new (window.AudioContext || window.webkitAudioContext)();
         
@@ -923,23 +929,64 @@
                     o.start(); 
                     o.stop(actx.currentTime + d); 
                 } catch(e) {
-                    console.log("Audio blocked", e);
+                    // Fail silently if blocked
                 }
             },
             
-            click: () => { sfx.play(800, 'square', 0.1); },
-            buy: () => { sfx.play(500, 'sine', 0.1); setTimeout(() => { sfx.play(700, 'sine', 0.2); }, 100); },
-            sell: () => { sfx.play(1300, 'triangle', 0.1); },
-            use: () => { sfx.play(1500, 'sawtooth', 0.3); },
-            synth: () => { sfx.play(200, 'square', 0.5, 0.1); setTimeout(() => { sfx.play(800, 'sine', 0.8, 0.2); }, 300); },
-            craft: () => { sfx.play(400, 'triangle', 0.3, 0.1); setTimeout(() => { sfx.play(600, 'sawtooth', 0.3, 0.2); }, 200); setTimeout(() => { sfx.play(900, 'sine', 0.5, 0.3); }, 400); },
-            reveal: (p) => { sfx.play(p, 'sine', 0.4, 0.1); },
-            alert: () => { sfx.play(200, 'sawtooth', 0.2, 0.1); setTimeout(() => { sfx.play(250, 'sawtooth', 0.3, 0.1); }, 150); }
+            click: () => {
+                sfx.play(800, 'square', 0.1);
+            },
+            
+            buy: () => { 
+                sfx.play(500, 'sine', 0.1); 
+                setTimeout(() => {
+                    sfx.play(700, 'sine', 0.2);
+                }, 100); 
+            },
+            
+            sell: () => {
+                sfx.play(1300, 'triangle', 0.1);
+            },
+            
+            use: () => {
+                sfx.play(1500, 'sawtooth', 0.3);
+            },
+            
+            synth: () => { 
+                sfx.play(200, 'square', 0.5, 0.1); 
+                setTimeout(() => {
+                    sfx.play(800, 'sine', 0.8, 0.2);
+                }, 300); 
+            },
+            
+            craft: () => { 
+                sfx.play(400, 'triangle', 0.3, 0.1); 
+                setTimeout(() => {
+                    sfx.play(600, 'sawtooth', 0.3, 0.2);
+                }, 200); 
+                setTimeout(() => {
+                    sfx.play(900, 'sine', 0.5, 0.3);
+                }, 400); 
+            },
+            
+            reveal: (p) => {
+                sfx.play(p, 'sine', 0.4, 0.1);
+            },
+            
+            alert: () => { 
+                sfx.play(200, 'sawtooth', 0.2, 0.1); 
+                setTimeout(() => {
+                    sfx.play(250, 'sawtooth', 0.3, 0.1);
+                }, 150); 
+            }
         };
 
         function notifyCenter(msg, btnText, btnAction) {
             let hub = document.getElementById('notification-hub'); 
-            if(!hub) { return; }
+            
+            if(!hub) {
+                return; 
+            }
             
             sfx.alert();
             
@@ -957,16 +1004,20 @@
             
             btn.onclick = () => { 
                 t.remove(); 
-                if(btnAction) { btnAction(); }
+                if(btnAction) {
+                    btnAction(); 
+                }
             };
             
             setTimeout(() => { 
-                if(t.parentElement) { t.remove(); }
+                if(t.parentElement) {
+                    t.remove(); 
+                }
             }, 8000);
         }
 
         // ==========================================
-        // FIREBASE SETUP
+        // 2. FIREBASE SETUP
         // ==========================================
         const firebaseConfig = {
             apiKey: "AIzaSyAActFtDrgVBq8wAOujPzETSDaU3nhtjhU",
@@ -985,7 +1036,7 @@
         const db = firebase.firestore();
 
         // ==========================================
-        // DATA ARCHITECTURE (1000 ITEMS COMPRESSED INTO ARRAYS)
+        // 3. DATA ARCHITECTURE
         // ==========================================
         let cId = 1; 
         const ALL_COLORS = new Map(); 
@@ -1007,7 +1058,8 @@
 
         const PACK_PRICES = [];
         for(let i=0; i<60; i++) { 
-            PACK_PRICES.push(Math.floor(50 + (250 * i) + (400 * Math.pow(i, 2)) + (5 * Math.pow(i, 3)))); 
+            let pVal = Math.floor(50 + (250 * i) + (400 * Math.pow(i, 2)) + (5 * Math.pow(i, 3)));
+            PACK_PRICES.push(pVal); 
         }
 
         const PACK_DATA = [
@@ -1170,7 +1222,7 @@
                 isEvent: true,
                 isNestedPack: true, 
                 nestedColors: colors,
-                source: `Workshop Crafting / Anomaly Event`
+                source: `Workshop / Anomaly Event`
             };
             
             ALL_COLORS.set(packItem.id, packItem);
@@ -1178,8 +1230,19 @@
             return packItem;
         });
 
-        const ABILITY_TYPES = ['steal', 'rob_cash', 'anomaly', 'duplicate', 'midas', 'omni_pull', 'black_hole', 'shield'];
-        const ABIL_NAMES = ["Thief's", "Bandit", "Rogue", "Plunder", "Corrupt", "Glitch", "Hacker", "Virus", "Chaos", "Mirage", "Illusion", "Phantom", "Midas", "Golden", "Wealth", "Fortune", "Zenith", "Apex", "Omega", "Singularity", "Void", "Null", "Aegis", "Bulwark"];
+        const ABILITY_TYPES = [
+            'steal', 'rob_cash', 'anomaly', 'duplicate', 
+            'midas', 'omni_pull', 'black_hole', 'shield'
+        ];
+        
+        const ABIL_NAMES = [
+            "Thief's", "Bandit", "Rogue", "Plunder", 
+            "Corrupt", "Glitch", "Hacker", "Virus", 
+            "Chaos", "Mirage", "Illusion", "Phantom", 
+            "Midas", "Golden", "Wealth", "Fortune", 
+            "Zenith", "Apex", "Omega", "Singularity", 
+            "Void", "Null", "Aegis", "Bulwark"
+        ];
         
         ABIL_NAMES.forEach((n, i) => {
             let abil = ABILITY_TYPES[i % ABILITY_TYPES.length];
@@ -1191,7 +1254,7 @@
                 val: 1000000 + (i*50000), 
                 ability: abil, 
                 isAction: true,
-                source: `Action Element (Rare Store Drop / Synth)`
+                source: `Action Element`
             };
             
             POOL.action.push(inst); 
@@ -1212,7 +1275,7 @@
             val: 1000000, 
             isNestedPack: true, 
             poolId: 0,
-            source: `Hidden Pack (Rare Drop in Island Pack)`
+            source: `Island Pack Drop`
         };
         
         const nPack2 = { 
@@ -1222,7 +1285,7 @@
             val: 2000000, 
             isNestedPack: true, 
             poolId: 1,
-            source: `Hidden Pack (Rare Drop in Cape Pack)`
+            source: `Cape Pack Drop`
         };
         
         POOL.nested.push(nPack1, nPack2); 
@@ -1236,15 +1299,26 @@
         }
 
         const N_POOLS = [[], []];
+        
         const np1Prefix = ["Time", "Space", "Reality", "Dimension", "Quantum", "Gravity"];
         const np1Suffix = ["Tear", "Rift", "Fracture", "Echo", "Loop"];
         let np1Names = []; 
-        np1Prefix.forEach(p => { np1Suffix.forEach(s => { np1Names.push(`${p} ${s}`); }); }); 
+        
+        np1Prefix.forEach(p => {
+            np1Suffix.forEach(s => {
+                np1Names.push(`${p} ${s}`);
+            });
+        }); 
         
         const np2Prefix = ["Despair", "Malice", "Greed", "Sorrow", "Wrath", "Chaos"];
         const np2Suffix = ["Blight", "Curse", "Bane", "Ruin", "Plague"];
         let np2Names = []; 
-        np2Prefix.forEach(p => { np2Suffix.forEach(s => { np2Names.push(`${p} ${s}`); }); }); 
+        
+        np2Prefix.forEach(p => {
+            np2Suffix.forEach(s => {
+                np2Names.push(`${p} ${s}`);
+            });
+        }); 
 
         np1Names.forEach((n, i) => { 
             let c1 = { 
@@ -1252,7 +1326,7 @@
                 name: n, 
                 hex: `hsl(${i*12}, 50%, 50%)`, 
                 val: 500000 * (i+1),
-                source: `Inside Paradox Cache`
+                source: `Paradox Cache`
             }; 
             N_POOLS[0].push(c1); 
             ALL_COLORS.set(c1.id, c1); 
@@ -1264,45 +1338,68 @@
                 name: n, 
                 hex: `hsl(${i*12}, 100%, 20%)`, 
                 val: 650000 * (i+1),
-                source: `Inside Pandora's Box`
+                source: `Pandora's Box`
             }; 
             N_POOLS[1].push(c2); 
             ALL_COLORS.set(c2.id, c2); 
         });
 
-        const SYNTH_NAMES = ["Adamantium", "Mythril", "Orichalcum", "Vibranium", "Aetherium", "Neutronium", "Dark Energy", "Chroniton", "Graviton", "Tachyon Matrix", "Void Alloy", "Starmetal", "Phobium", "Xenon Glass", "Hyper-Carbon", "Tritium Glow", "Astral Core", "Oblivion Crystal", "Singularity Matter", "Nexus Essence"];
+        const SYNTH_NAMES = [
+            "Adamantium", "Mythril", "Orichalcum", "Vibranium", 
+            "Aetherium", "Neutronium", "Dark Energy", "Chroniton", 
+            "Graviton", "Tachyon Matrix", "Void Alloy", "Starmetal", 
+            "Phobium", "Xenon Glass", "Hyper-Carbon", "Tritium Glow", 
+            "Astral Core", "Oblivion Crystal", "Singularity Matter", "Nexus Essence"
+        ];
+        
         SYNTH_NAMES.forEach((n, i) => { 
             let sC = { 
                 id: `C${cId++}`, 
                 name: n, 
                 hex: `hsl(${i*18}, 80%, 60%)`, 
                 val: 2500000 + (i*500000),
-                source: `Synthesis Lab ($5M+ Sacrifice)`
+                source: `Synthesis Lab`
             }; 
             POOL.synthOut.push(sC); 
             ALL_COLORS.set(sC.id, sC); 
         });
 
-        const exc1 = { id: `C${cId++}`, name: "Titanium White", hex: "#FFFFFF", val: 15000000, source: `Omni-Zenith Pack / Jackpot` }; 
-        const exc2 = { id: `C${cId++}`, name: "Vantablack", hex: "#000000", val: 20000000, source: `Omni-Zenith Pack / Jackpot` };
+        const exc1 = { 
+            id: `C${cId++}`, 
+            name: "Titanium White", 
+            hex: "#FFFFFF", 
+            val: 15000000,
+            source: `Omni-Zenith Pack / Jackpot`
+        }; 
+        
+        const exc2 = { 
+            id: `C${cId++}`, 
+            name: "Vantablack", 
+            hex: "#000000", 
+            val: 20000000,
+            source: `Omni-Zenith Pack / Jackpot`
+        };
+        
         POOL.exc.push(exc1, exc2); 
         ALL_COLORS.set(exc1.id, exc1); 
         ALL_COLORS.set(exc2.id, exc2);
 
         const CASINO_NAMES = ["Jackpot Gold", "Seven Red", "Cherry Pink", "Diamond Cyan", "Spade Black", "Club Grey", "Heart Crimson", "Chip White", "Dealer Green", "Roulette Emerald"];
+        
         CASINO_NAMES.forEach((n, i) => { 
             let c = { 
                 id: `C${cId++}`, 
                 name: n, 
                 hex: `hsl(${i*36}, 100%, 50%)`, 
                 val: 100000 + (i*10000),
-                source: `Cosmic Casino (Roulette)`
+                source: `Cosmic Casino`
             }; 
             POOL.casino.push(c); 
             ALL_COLORS.set(c.id, c); 
         });
 
         const RELIC_NAMES = ["Solar Core", "Lunar Dust", "Mars Rust", "Venus Red", "Jupiter Gas", "Saturn Storm", "Uranus Ring", "Neptune Ice", "Pluto Deep", "Asteroid Brown", "Comet Tail", "Meteor Streak", "Galaxy Spiral", "Quasar Burst", "Pulsar Flash", "Supervoid Black", "Cosmic Ray", "Nebula Mist", "Starlight White", "Blackhole Edge"];
+        
         RELIC_NAMES.forEach((n, i) => { 
             let c = { 
                 id: `C${cId++}`, 
@@ -1316,6 +1413,7 @@
         });
 
         const BM_NAMES = ["Smuggler Black", "Illicit Neon", "Banned Blue", "Corrupt Crimson", "Pirated Pink", "Stolen Silver", "Fenced Gold", "Bootleg Bronze", "Shadow Market Grey", "Underworld Umbra"];
+        
         BM_NAMES.forEach((n, i) => { 
             let c = { 
                 id: `C${cId++}`, 
@@ -1329,13 +1427,14 @@
         });
 
         const RIFT_NAMES = ["Rift Walker", "Void Spawn", "Abyssal Eye", "Dimension Horror", "Time Parasite", "Reality Leech", "Chaos Fiend", "Entropy Beast", "Null Entity", "Paradox Anomaly"];
+        
         RIFT_NAMES.forEach((n, i) => { 
             let c = { 
                 id: `C${cId++}`, 
                 name: n, 
                 hex: `hsl(${i*36}, 100%, 20%)`, 
                 val: 1000000 + (i*50000),
-                source: `The Void Rift (Sacrifice)`
+                source: `The Void Rift`
             }; 
             POOL.rift.push(c); 
             ALL_COLORS.set(c.id, c); 
@@ -1392,14 +1491,19 @@
                 isNestedPack: true, 
                 isCraftPack: true, 
                 nestedColors: packCols,
-                source: `The Workshop (Crafting)`
+                source: `The Workshop`
             };
             
             POOL.craftPacks.push(packItem);
             ALL_COLORS.set(packItem.id, packItem);
         });
 
-        const BOUNTY_NAMES = ["Bounty Hunter Red", "Mercenary Green", "Tracker Blue", "Assassin Black", "Sniper Silver", "Contract Gold", "Outlaw Purple", "Ranger Brown", "Vigilante White", "Renegade Cyan"];
+        const BOUNTY_NAMES = [
+            "Bounty Hunter Red", "Mercenary Green", "Tracker Blue", "Assassin Black", 
+            "Sniper Silver", "Contract Gold", "Outlaw Purple", "Ranger Brown", 
+            "Vigilante White", "Renegade Cyan"
+        ];
+        
         BOUNTY_NAMES.forEach((n, i) => {
             let c = { 
                 id: `C${cId++}`, 
@@ -1412,7 +1516,13 @@
             ALL_COLORS.set(c.id, c);
         });
 
-        const ORE_NAMES = ["Iron Ore", "Copper Ore", "Silver Ore", "Gold Ore", "Platinum Ore", "Titanium Ore", "Cobalt Ore", "Palladium Ore", "Iridium Ore", "Osmium Ore", "Rhodium Ore", "Ruthenium Ore", "Mithril Ore", "Adamant Ore", "Orichalcum Ore", "Aetherium Ore", "Void Ore", "Quantum Ore", "Cosmic Ore", "Nexus Ore"];
+        const ORE_NAMES = [
+            "Iron Ore", "Copper Ore", "Silver Ore", "Gold Ore", "Platinum Ore", 
+            "Titanium Ore", "Cobalt Ore", "Palladium Ore", "Iridium Ore", "Osmium Ore", 
+            "Rhodium Ore", "Ruthenium Ore", "Mithril Ore", "Adamant Ore", "Orichalcum Ore", 
+            "Aetherium Ore", "Void Ore", "Quantum Ore", "Cosmic Ore", "Nexus Ore"
+        ];
+        
         ORE_NAMES.forEach((n, i) => {
             let c = { 
                 id: `C${cId++}`, 
@@ -1425,7 +1535,13 @@
             ALL_COLORS.set(c.id, c);
         });
 
-        const HACKER_NAMES = ["Rootkit Green", "Firewall Red", "Trojan Black", "Worm Purple", "Malware Orange", "Spyware Grey", "Keylogger Cyan", "Botnet Blue", "Ransomware Gold", "Phish White", "Spoof Silver", "Logic Bomb Yellow", "Zero-Day Magenta", "Exploit Indigo", "Backdoor Teal", "Payload Pink", "DDoS Crimson"];
+        const HACKER_NAMES = [
+            "Rootkit Green", "Firewall Red", "Trojan Black", "Worm Purple", "Malware Orange", 
+            "Spyware Grey", "Keylogger Cyan", "Botnet Blue", "Ransomware Gold", "Phish White", 
+            "Spoof Silver", "Logic Bomb Yellow", "Zero-Day Magenta", "Exploit Indigo", 
+            "Backdoor Teal", "Payload Pink", "DDoS Crimson"
+        ];
+        
         HACKER_NAMES.forEach((n, i) => {
             let c = { 
                 id: `C${cId++}`, 
@@ -1438,34 +1554,40 @@
             ALL_COLORS.set(c.id, c);
         });
 
-        const DIVIDEND_NAMES = ["Dividend Emerald", "Interest Gold", "Vault Platinum", "Yield Silver", "Equity Bronze", "Asset Diamond", "Capital Sapphire", "Bond Ruby", "Credit Topaz", "Trust Onyx"];
+        const DIVIDEND_NAMES = [
+            "Dividend Emerald", "Interest Gold", "Vault Platinum", "Yield Silver", 
+            "Equity Bronze", "Asset Diamond", "Capital Sapphire", "Bond Ruby", 
+            "Credit Topaz", "Trust Onyx"
+        ];
+        
         DIVIDEND_NAMES.forEach((n, i) => {
             let c = { 
                 id: `C${cId++}`, 
                 name: n, 
                 hex: `hsl(${i*36}, 60%, 70%)`, 
                 val: 1000000 + (i*200000),
-                source: `Nexus Bank (Withdrawal)`
+                source: `Nexus Bank`
             };
             POOL.dividend.push(c); 
             ALL_COLORS.set(c.id, c);
         });
 
         const COLLIDER_NAMES = Array.from({length: 40}, (_, i) => `Collider Shard ${i+1}`);
+        
         COLLIDER_NAMES.forEach((n, i) => {
             let c = { 
                 id: `C${cId++}`, 
                 name: n, 
                 hex: `hsl(${i*9}, 100%, 60%)`, 
                 val: 500000 + (i*10000),
-                source: `The Particle Collider`
+                source: `Particle Collider`
             };
             POOL.collider.push(c); 
             ALL_COLORS.set(c.id, c);
         });
 
         // ==========================================
-        // GAME STATE & CORE LOGIC (FULLY UNCOMPRESSED)
+        // GAME STATE & CORE LOGIC
         // ==========================================
         let state = { 
             name: "", 
@@ -1509,7 +1631,6 @@
             }); 
             
             let el = document.getElementById(id); 
-            
             if(el) {
                 el.classList.add('active'); 
             }
@@ -1519,14 +1640,342 @@
 
         function closeOverlay(id) { 
             let el = document.getElementById(id); 
-            
             if(el) {
                 el.style.display = 'none'; 
             }
-            
             sfx.click(); 
         }
 
+        // ==========================================
+        // UI & OVERLAYS 
+        // ==========================================
+        function openTradeHub() { 
+            let overlay = document.getElementById('hub-overlay'); 
+            if(!overlay) return; 
+            
+            overlay.style.display = 'flex'; 
+            sfx.click(); 
+            
+            const list = document.getElementById('player-list'); 
+            list.innerHTML = ''; 
+            
+            Object.keys(state.players).forEach(p => { 
+                if(p === state.name || state.players[p].isBot) return; 
+                
+                let btn = document.createElement('div'); 
+                btn.className = 'glass'; 
+                btn.style = "display:flex; justify-content:space-between; align-items:center; background: rgba(0,240,255,0.05);"; 
+                btn.innerHTML = `
+                    <span style="font-size:1.1rem;">
+                        <b>${p}</b> 
+                        <span style="color:#888;">(${state.players[p].invSize} Uniques)</span>
+                    </span> 
+                    <button onclick="openDraftTrade('${p}')">DRAFT UPLINK</button>
+                `; 
+                list.appendChild(btn); 
+            }); 
+        }
+
+        function openDraftTrade(targetName) {
+            if(Date.now() - lastTradeSent < 60000) {
+                return notifyCenter("UPLINK COOLING DOWN (1 Min Wait)", "ACKNOWLEDGE");
+            }
+            
+            closeOverlay('hub-overlay'); 
+            
+            draftTarget = targetName; 
+            draftOffer = {cash:0, cols:[]}; 
+            draftRequest = {cash:0, cols:[]};
+            
+            let dtn = document.getElementById('draft-target-name'); 
+            if(dtn) {
+                dtn.innerText = targetName; 
+            }
+            
+            let dmc = document.getElementById('draft-my-cash'); 
+            if(dmc) dmc.value = 0; 
+            
+            let dtc = document.getElementById('draft-their-cash'); 
+            if(dtc) dtc.value = 0;
+            
+            let sMine = document.getElementById('draft-search-mine'); 
+            if(sMine) sMine.value = "";
+            
+            let sTheirs = document.getElementById('draft-search-theirs'); 
+            if(sTheirs) sTheirs.value = "";
+
+            let ov = document.getElementById('draft-overlay'); 
+            if(ov) { 
+                ov.style.display = 'flex'; 
+                sfx.click(); 
+                renderDraftUI(); 
+            }
+        }
+
+        function renderDraftUI() {
+            let sMine = document.getElementById('draft-search-mine');
+            let qMine = sMine ? sMine.value.toUpperCase() : "";
+            
+            let sTheirs = document.getElementById('draft-search-theirs');
+            let qTheirs = sTheirs ? sTheirs.value.toUpperCase() : "";
+
+            let dmo = document.getElementById('draft-my-offer'); 
+            if(dmo) { 
+                dmo.innerHTML = draftOffer.cols.map((c,i) => {
+                    return `
+                        <div class="trade-item-row" style="border-color:${c.x}" onclick="removeDraftOffer(${i})">
+                            <span style="color:${c.x}">[${c.r}] ${c.name}</span> 
+                            <span>$${c.val.toLocaleString()}</span>
+                        </div>
+                    `;
+                }).join(''); 
+            }
+            
+            let dmi = document.getElementById('draft-my-inv'); 
+            if(dmi) { 
+                dmi.innerHTML = state.inv.filter(c => !qMine || c.name.toUpperCase().includes(qMine)).map((c,i) => {
+                    return `
+                        <div class="trade-item-row" style="border-color:${c.x}" onclick="addDraftOffer(${state.inv.indexOf(c)})">
+                            <span style="color:${c.x}">[${c.r}] ${c.name}</span> 
+                            <span>$${c.val.toLocaleString()}</span>
+                        </div>
+                    `;
+                }).join(''); 
+            }
+            
+            let dto = document.getElementById('draft-their-offer'); 
+            if(dto) { 
+                dto.innerHTML = draftRequest.cols.map((c,i) => {
+                    return `
+                        <div class="trade-item-row" style="border-color:${c.x}" onclick="removeDraftRequest(${i})">
+                            <span style="color:${c.x}">[${c.r}] ${c.name}</span> 
+                            <span>$${c.val.toLocaleString()}</span>
+                        </div>
+                    `;
+                }).join(''); 
+            }
+            
+            let theirData = state.players[draftTarget]; 
+            let dti = document.getElementById('draft-their-inv');
+            
+            if (theirData && theirData.items && dti) {
+                let mapped = theirData.items.map(id => ALL_COLORS.get(id)).filter(c => {
+                    return c && (!qTheirs || c.name.toUpperCase().includes(qTheirs));
+                });
+                
+                dti.innerHTML = mapped.map(c => { 
+                    let tier = getTierInfo(c.val); 
+                    return `
+                        <div class="trade-item-row" style="border-color:${tier.x}" onclick="addDraftRequest('${c.id}')">
+                            <span style="color:${tier.x}">[${tier.r}] ${c.name}</span> 
+                            <span>$${c.val.toLocaleString()}</span>
+                        </div>
+                    `; 
+                }).join('');
+            }
+        }
+
+        function addDraftOffer(i) { 
+            let c = state.inv[i]; 
+            if(!draftOffer.cols.find(x => x.uId === c.uId)) { 
+                draftOffer.cols.push(c); 
+                sfx.click(); 
+                renderDraftUI(); 
+            } 
+        }
+
+        function removeDraftOffer(i) { 
+            draftOffer.cols.splice(i,1); 
+            sfx.click(); 
+            renderDraftUI(); 
+        }
+
+        function addDraftRequest(id) { 
+            let c = ALL_COLORS.get(id); 
+            if(c && !draftRequest.cols.find(x => x.id === c.id)) { 
+                let tier = getTierInfo(c.val); 
+                draftRequest.cols.push({ 
+                    id: c.id, 
+                    name: c.name, 
+                    hex: c.hex, 
+                    val: c.val, 
+                    r: tier.r, 
+                    x: tier.x 
+                }); 
+                sfx.click(); 
+                renderDraftUI(); 
+            } 
+        }
+
+        function removeDraftRequest(i) { 
+            draftRequest.cols.splice(i,1); 
+            sfx.click(); 
+            renderDraftUI(); 
+        }
+
+        function sendDraftOffer() {
+            let dmc = document.getElementById('draft-my-cash'); 
+            draftOffer.cash = dmc ? (parseInt(dmc.value) || 0) : 0;
+            
+            if(draftOffer.cash > state.cash) {
+                return notifyCenter("INSUFFICIENT CREDITS", "DISMISS");
+            }
+            
+            let dtc = document.getElementById('draft-their-cash'); 
+            draftRequest.cash = dtc ? (parseInt(dtc.value) || 0) : 0;
+            
+            lastTradeSent = Date.now(); 
+            closeOverlay('draft-overlay'); 
+            notifyCenter(`Uplink sent to ${draftTarget}`, "OK");
+            
+            if(state.code) { 
+                db.collection('games').doc(state.code).collection('trades').add({ 
+                    p1: state.name, 
+                    p2: draftTarget, 
+                    status: 'pending', 
+                    type: 'async', 
+                    ts: Date.now(), 
+                    o1: draftOffer, 
+                    o2: draftRequest 
+                }); 
+            }
+        }
+
+        function openIncomingTrades() {
+            let ov = document.getElementById('incoming-overlay'); 
+            if(!ov) return; 
+            
+            ov.style.display = 'flex'; 
+            sfx.click(); 
+            
+            const list = document.getElementById('incoming-list'); 
+            if(!list) return; 
+            
+            list.innerHTML = '';
+            
+            let keys = Object.keys(pendingTradesCache); 
+            if(keys.length === 0) {
+                return list.innerHTML = "<p style='color:#888;'>No pending transmissions.</p>";
+            }
+            
+            keys.forEach(id => {
+                let d = pendingTradesCache[id]; 
+                let el = document.createElement('div'); 
+                el.className = 'glass';
+                
+                let offCols = d.o1.cols.map(c => `<span style="color:${c.x||'#fff'}">${c.name}</span>`).join(', ') || 'None'; 
+                let reqCols = d.o2.cols.map(c => `<span style="color:${c.x||'#fff'}">${c.name}</span>`).join(', ') || 'None';
+                
+                el.innerHTML = `
+                    <h3>OFFER FROM: [${d.p1}]</h3>
+                    <div style="margin:10px 0; background:rgba(0,0,0,0.5); padding:10px; border-left: 3px solid var(--cyan);">
+                        <p style="color:var(--cyan); font-weight:bold;">THEY GIVE YOU:</p>
+                        <p>$${d.o1.cash.toLocaleString()} CREDITS & ${offCols}</p>
+                    </div>
+                    <div style="margin:10px 0; background:rgba(0,0,0,0.5); padding:10px; border-left: 3px solid var(--pink);">
+                        <p style="color:var(--pink); font-weight:bold;">THEY WANT FROM YOU:</p>
+                        <p>$${d.o2.cash.toLocaleString()} CREDITS & ${reqCols}</p>
+                    </div>
+                    <div style="display:flex; gap:10px;">
+                        <button class="btn-pink" onclick="acceptAsyncTrade('${id}')">ACCEPT & SWAP</button>
+                        <button onclick="cancelTradeDoc('${id}')" style="border-color:#555; color:#555;">DECLINE</button>
+                    </div>
+                `;
+                list.appendChild(el);
+            });
+        }
+        
+        function cancelTradeDoc(id) { 
+            if(state.code) {
+                db.collection('games').doc(state.code).collection('trades').doc(id).update({status: 'cancelled'}); 
+            }
+        }
+
+        // ==========================================
+        // BOT AI LOGIC
+        // ==========================================
+        let lastBotTrade = 0;
+        
+        function executeBotAI() {
+            if(state.status !== 'active' || !state.code) return; 
+            
+            if(Date.now() - lastBotTrade < 60000) return; 
+            
+            let bots = Object.keys(state.players).filter(p => state.players[p].isBot); 
+            if(bots.length === 0) return; 
+            
+            let botId = bots[Math.floor(Math.random() * bots.length)]; 
+            let bot = state.players[botId];
+            
+            let humans = Object.keys(state.players).filter(p => !state.players[p].isBot); 
+            if(humans.length === 0) return; 
+            
+            let targetId = humans[Math.floor(Math.random() * humans.length)]; 
+            let target = state.players[targetId];
+            
+            let type = Math.floor(Math.random() * 3); 
+            let tDoc = { 
+                p1: botId, p2: targetId, status: 'pending', ts: Date.now(), 
+                type: 'async', o1: {cash:0, cols:[]}, o2: {cash:0, cols:[]} 
+            };
+
+            if(type === 0 && target.invSize > 0 && bot.cash > 100) { 
+                let tId = target.items[Math.floor(Math.random() * target.items.length)]; 
+                let cData = ALL_COLORS.get(tId); 
+                
+                if(!cData) return; 
+                
+                let oCash = Math.floor(cData.val * 1.5); 
+                if(oCash > bot.cash) return; 
+                
+                tDoc.o1.cash = oCash; 
+                tDoc.o1.cols = [];
+                tDoc.o2.cols = [{
+                    id: cData.id, name: cData.name, hex: cData.hex, 
+                    val: cData.val, r: getTierInfo(cData.val).r, x: getTierInfo(cData.val).x 
+                }]; 
+            } 
+            else if (type === 1 && bot.items && bot.items.length > 0) { 
+                let bId = bot.items[Math.floor(Math.random() * bot.items.length)]; 
+                let cData = ALL_COLORS.get(bId); 
+                
+                if(!cData) return; 
+                
+                let rCash = Math.floor(cData.val * 0.9); 
+                if(target.cash < rCash) return; 
+                
+                tDoc.o1.cols = [{
+                    id: cData.id, name: cData.name, hex: cData.hex, 
+                    val: cData.val, r: getTierInfo(cData.val).r, x: getTierInfo(cData.val).x 
+                }]; 
+                tDoc.o2.cash = rCash;
+                tDoc.o2.cols = []; 
+            } 
+            else if (type === 2 && bot.items && bot.items.length > 0 && target.invSize > 0) { 
+                let bC = ALL_COLORS.get(bot.items[Math.floor(Math.random() * bot.items.length)]); 
+                let tC = ALL_COLORS.get(target.items[Math.floor(Math.random() * target.items.length)]); 
+                
+                if(!bC || !tC) return; 
+                
+                tDoc.o1.cols = [{
+                    id: bC.id, name: bC.name, hex: bC.hex, 
+                    val: bC.val, r: getTierInfo(bC.val).r, x: getTierInfo(bC.val).x 
+                }]; 
+                tDoc.o2.cols = [{
+                    id: tC.id, name: tC.name, hex: tC.hex, 
+                    val: tC.val, r: getTierInfo(tC.val).r, x: getTierInfo(tC.val).x 
+                }]; 
+            } else { 
+                return; 
+            }
+            
+            lastBotTrade = Date.now(); 
+            db.collection('games').doc(state.code).collection('trades').add(tDoc);
+        }
+
+        // ==========================================
+        // OTHER CORE MECHANICS
+        // ==========================================
         function addXp(amt) {
             state.xp += amt; 
             let reqXp = state.lvl * 100;
@@ -1940,19 +2389,13 @@
                     let reqs = [];
                     
                     let p1 = hardStd[rng() % hardStd.length];
-                    if(p1) {
-                        reqs.push({ id: p1.id, name: p1.name, hex: p1.hex });
-                    }
+                    if(p1) reqs.push({ id: p1.id, name: p1.name, hex: p1.hex });
                     
                     let p2 = hardStd[rng() % hardStd.length];
-                    if(p2) {
-                        reqs.push({ id: p2.id, name: p2.name, hex: p2.hex });
-                    }
+                    if(p2) reqs.push({ id: p2.id, name: p2.name, hex: p2.hex });
                     
                     let p3 = mixedRare[rng() % mixedRare.length];
-                    if(p3) {
-                        reqs.push({ id: p3.id, name: p3.name, hex: p3.hex });
-                    }
+                    if(p3) reqs.push({ id: p3.id, name: p3.name, hex: p3.hex });
                     
                     if(reqs.length === 3) {
                         state.recipes.push({ 
@@ -2615,8 +3058,11 @@
                     }
                     
                     if(state.isHost) { 
-                        document.getElementById('btn-add-bot').style.display = 'block'; 
-                        document.getElementById('btn-start-game').style.display = 'block'; 
+                        let badd = document.getElementById('btn-add-bot');
+                        if(badd) badd.style.display = 'block'; 
+                        
+                        let bstart = document.getElementById('btn-start-game');
+                        if(bstart) bstart.style.display = 'block'; 
                     }
                 } else if(d.status === 'active' && state.status !== 'active') {
                     state.status = 'active'; 
@@ -2685,6 +3131,7 @@
                         notifyCenter(`INCOMING UPLINK FROM ${c.doc.data().p1}`, "VIEW", openIncomingTrades); 
                         updateTradeBadge(); 
                     }
+                    
                     if(c.type === 'removed' || c.doc.data().status !== 'pending') { 
                         delete pendingTradesCache[c.doc.id]; 
                         updateTradeBadge(); 
@@ -2699,11 +3146,13 @@
 
             setInterval(() => { 
                 let now = Date.now(); 
+                
                 Object.keys(pendingTradesCache).forEach(id => { 
                     if(now - pendingTradesCache[id].ts > 60000) { 
                         if(state.code) {
                             db.collection('games').doc(state.code).collection('trades').doc(id).update({status: 'cancelled'}); 
                         }
+                        
                         delete pendingTradesCache[id]; 
                         updateTradeBadge(); 
                     }
@@ -2962,6 +3411,7 @@
 
         function pushToInv(c) {
             if(!c) return;
+            
             let t = getTierInfo(c.val);
             
             state.inv.push({ 
@@ -3065,8 +3515,10 @@
         function sellColor(idx, e) { 
             e.stopPropagation(); 
             let c = state.inv[idx]; 
+            
             sfx.sell(); 
             updateCash(Math.floor(c.val * state.sellMod)); 
+            
             state.inv.splice(idx,1); 
             syncInv(); 
         }
@@ -3083,9 +3535,64 @@
             } 
         }
 
-        // ==========================================
-        // END GAME
-        // ==========================================
+        function openGlobalDex() { 
+            const m = document.getElementById('dex-overlay'); 
+            const g = document.getElementById('global-dex-grid'); 
+            
+            if(!m || !g) return; 
+            
+            m.style.display = 'flex'; 
+            g.innerHTML = ''; 
+            
+            ALL_COLORS.forEach((c) => { 
+                let div = document.createElement('div'); 
+                div.className = 'dex-cell'; 
+                div.style.background = c.hex; 
+                div.style.opacity = state.dex.has(c.id) ? '1' : '0.15'; 
+                div.dataset.name = c.name.toUpperCase(); 
+                
+                div.onclick = () => { 
+                    let owners = Object.keys(state.players).filter(p => state.players[p].items && state.players[p].items.includes(c.id)); 
+                    let dhi = document.getElementById('dex-hover-info'); 
+                    
+                    if(dhi) {
+                        dhi.innerHTML = `
+                            <div>
+                                <span style="color:#fff; font-weight:bold; font-size:1.2rem;">${c.name}</span> - <span style="color:var(--gold); font-weight:bold;">$${c.val.toLocaleString()}</span><br>
+                                <span style="color:var(--cyan); font-size: 0.9rem;">SOURCE: ${c.source || "Unknown Origin"}</span><br>
+                                <span style="font-size: 0.8rem; color: #888;">Owned by: ${owners.length > 0 ? owners.join(', ') : 'None'}</span>
+                            </div>
+                        `; 
+                    }
+                }; 
+                
+                g.appendChild(div); 
+            }); 
+            
+            let sInput = document.getElementById('dex-search-input');
+            if(sInput) {
+                sInput.value = "";
+            }
+        }
+
+        function filterDex() {
+            let sInput = document.getElementById('dex-search-input');
+            let q = sInput ? sInput.value.toUpperCase() : "";
+            
+            let grid = document.getElementById('global-dex-grid');
+            if (!grid) return;
+            
+            let cells = grid.getElementsByClassName('dex-cell');
+            
+            for(let i=0; i<cells.length; i++) {
+                if (cells[i].dataset.name.includes(q)) {
+                    cells[i].classList.remove('hidden');
+                } else {
+                    cells[i].classList.add('hidden');
+                }
+            }
+        }
+
         async function endGame() {
             clearInterval(loop); 
             
