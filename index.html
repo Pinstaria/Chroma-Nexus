@@ -3,9 +3,23 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>CHROMA NEXUS // V13.0 THE MILLENNIUM</title>
+    <title>CHROMA NEXUS // V13.1 ERROR-TRACKED</title>
     <link rel="icon" href="data:,">
     
+    <script>
+        window.onerror = function(message, source, lineno, colno, error) {
+            let errDiv = document.getElementById('debug-logger');
+            if(!errDiv) {
+                errDiv = document.createElement('div');
+                errDiv.id = 'debug-logger';
+                errDiv.style = "position:fixed; bottom:0; left:0; right:0; background:rgba(255,0,0,0.9); color:white; padding:15px; z-index:999999; font-family:monospace; font-size:14px; max-height:200px; overflow-y:auto; border-top: 3px solid #fff;";
+                document.body.appendChild(errDiv);
+            }
+            errDiv.innerHTML += `<p style="margin-bottom:5px;"><b>CRITICAL ERROR:</b> ${message} <br><span style="color:#ffaaaa;">Line: ${lineno} | Col: ${colno}</span></p>`;
+            return false;
+        };
+    </script>
+
     <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
     <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-firestore.js"></script>
     <link href="https://fonts.googleapis.com/css2?family=Rajdhani:wght@500;700&family=Share+Tech+Mono&display=swap" rel="stylesheet">
@@ -112,82 +126,20 @@
             cursor: not-allowed; 
         }
         
-        button.btn-pink { 
-            border-color: var(--pink); 
-            color: var(--pink); 
-        } 
-        
-        button.btn-pink:hover:not(:disabled) { 
-            background: var(--pink); 
-            color: #fff; 
-            box-shadow: 0 0 15px var(--pink); 
-        }
-        
-        button.btn-gold { 
-            border-color: var(--gold); 
-            color: var(--gold); 
-        } 
-        
-        button.btn-gold:hover:not(:disabled) { 
-            background: var(--gold); 
-            color: #000; 
-            box-shadow: 0 0 15px var(--gold); 
-        }
-        
-        button.btn-synth { 
-            border-color: var(--synth); 
-            color: var(--synth); 
-        } 
-        
-        button.btn-synth:hover:not(:disabled) { 
-            background: var(--synth); 
-            color: #fff; 
-            box-shadow: 0 0 15px var(--synth); 
-        }
-        
-        button.btn-void { 
-            border-color: var(--void); 
-            color: var(--void); 
-        } 
-        
-        button.btn-void:hover:not(:disabled) { 
-            background: var(--void); 
-            color: #fff; 
-            box-shadow: 0 0 15px var(--void); 
-        }
-
-        button.btn-craft { 
-            border-color: var(--craft); 
-            color: var(--craft); 
-        } 
-        
-        button.btn-craft:hover:not(:disabled) { 
-            background: var(--craft); 
-            color: #000; 
-            box-shadow: 0 0 15px var(--craft); 
-        }
-
-        button.btn-bank { 
-            border-color: var(--bank); 
-            color: var(--bank); 
-        } 
-        
-        button.btn-bank:hover:not(:disabled) { 
-            background: var(--bank); 
-            color: #000; 
-            box-shadow: 0 0 15px var(--bank); 
-        }
-
-        button.btn-hack { 
-            border-color: var(--hack); 
-            color: var(--hack); 
-        } 
-        
-        button.btn-hack:hover:not(:disabled) { 
-            background: var(--hack); 
-            color: #000; 
-            box-shadow: 0 0 15px var(--hack); 
-        }
+        button.btn-pink { border-color: var(--pink); color: var(--pink); } 
+        button.btn-pink:hover:not(:disabled) { background: var(--pink); color: #fff; box-shadow: 0 0 15px var(--pink); }
+        button.btn-gold { border-color: var(--gold); color: var(--gold); } 
+        button.btn-gold:hover:not(:disabled) { background: var(--gold); color: #000; box-shadow: 0 0 15px var(--gold); }
+        button.btn-synth { border-color: var(--synth); color: var(--synth); } 
+        button.btn-synth:hover:not(:disabled) { background: var(--synth); color: #fff; box-shadow: 0 0 15px var(--synth); }
+        button.btn-void { border-color: var(--void); color: var(--void); } 
+        button.btn-void:hover:not(:disabled) { background: var(--void); color: #fff; box-shadow: 0 0 15px var(--void); }
+        button.btn-craft { border-color: var(--craft); color: var(--craft); } 
+        button.btn-craft:hover:not(:disabled) { background: var(--craft); color: #000; box-shadow: 0 0 15px var(--craft); }
+        button.btn-bank { border-color: var(--bank); color: var(--bank); } 
+        button.btn-bank:hover:not(:disabled) { background: var(--bank); color: #000; box-shadow: 0 0 15px var(--bank); }
+        button.btn-hack { border-color: var(--hack); color: var(--hack); } 
+        button.btn-hack:hover:not(:disabled) { background: var(--hack); color: #000; box-shadow: 0 0 15px var(--hack); }
         
         button.btn-action { 
             border-color: var(--action); 
@@ -569,7 +521,7 @@
     <div id="setup-screen" class="screen active" style="align-items: center; justify-content: center;">
         <div class="glass" style="width: 100%; max-width: 650px; text-align: center;">
             <h1 class="glow-cyan" style="font-size: 3.5rem; margin-bottom: 5px;">CHROMA NEXUS</h1>
-            <p style="color: #777; font-size: 1.1rem; margin-bottom: 25px;">SECURE SPECTRAL ECONOMY // V13.0</p>
+            <p style="color: #777; font-size: 1.1rem; margin-bottom: 25px;">SECURE SPECTRAL ECONOMY // V13.1</p>
             
             <input type="text" id="playerName" placeholder="ENTER ALIAS..." required style="text-align: center; font-size: 1.3rem; margin-bottom: 25px;">
             
@@ -945,86 +897,49 @@
 
     <script>
         // ==========================================
-        // 1. AUDIO INITIALIZATION
+        // AUDIO INITIALIZATION
         // ==========================================
         const actx = new (window.AudioContext || window.webkitAudioContext)();
         
         const sfx = {
             play: (f, t, d, v=0.05) => { 
                 if(actx.state === 'suspended') {
-                    actx.resume(); 
+                    actx.resume().catch(() => { return; }); 
                 }
                 
-                let o = actx.createOscillator(); 
-                let g = actx.createGain(); 
-                
-                o.type = t; 
-                o.frequency.value = f; 
-                
-                g.gain.setValueAtTime(v, actx.currentTime); 
-                g.gain.exponentialRampToValueAtTime(0.001, actx.currentTime + d); 
-                
-                o.connect(g); 
-                g.connect(actx.destination); 
-                
-                o.start(); 
-                o.stop(actx.currentTime + d); 
+                try {
+                    let o = actx.createOscillator(); 
+                    let g = actx.createGain(); 
+                    
+                    o.type = t; 
+                    o.frequency.value = f; 
+                    
+                    g.gain.setValueAtTime(v, actx.currentTime); 
+                    g.gain.exponentialRampToValueAtTime(0.001, actx.currentTime + d); 
+                    
+                    o.connect(g); 
+                    g.connect(actx.destination); 
+                    
+                    o.start(); 
+                    o.stop(actx.currentTime + d); 
+                } catch(e) {
+                    console.log("Audio blocked", e);
+                }
             },
             
-            click: () => {
-                sfx.play(800, 'square', 0.1);
-            },
-            
-            buy: () => { 
-                sfx.play(500, 'sine', 0.1); 
-                setTimeout(() => {
-                    sfx.play(700, 'sine', 0.2);
-                }, 100); 
-            },
-            
-            sell: () => {
-                sfx.play(1300, 'triangle', 0.1);
-            },
-            
-            use: () => {
-                sfx.play(1500, 'sawtooth', 0.3);
-            },
-            
-            synth: () => { 
-                sfx.play(200, 'square', 0.5, 0.1); 
-                setTimeout(() => {
-                    sfx.play(800, 'sine', 0.8, 0.2);
-                }, 300); 
-            },
-            
-            craft: () => { 
-                sfx.play(400, 'triangle', 0.3, 0.1); 
-                setTimeout(() => {
-                    sfx.play(600, 'sawtooth', 0.3, 0.2);
-                }, 200); 
-                setTimeout(() => {
-                    sfx.play(900, 'sine', 0.5, 0.3);
-                }, 400); 
-            },
-            
-            reveal: (p) => {
-                sfx.play(p, 'sine', 0.4, 0.1);
-            },
-            
-            alert: () => { 
-                sfx.play(200, 'sawtooth', 0.2, 0.1); 
-                setTimeout(() => {
-                    sfx.play(250, 'sawtooth', 0.3, 0.1);
-                }, 150); 
-            }
+            click: () => { sfx.play(800, 'square', 0.1); },
+            buy: () => { sfx.play(500, 'sine', 0.1); setTimeout(() => { sfx.play(700, 'sine', 0.2); }, 100); },
+            sell: () => { sfx.play(1300, 'triangle', 0.1); },
+            use: () => { sfx.play(1500, 'sawtooth', 0.3); },
+            synth: () => { sfx.play(200, 'square', 0.5, 0.1); setTimeout(() => { sfx.play(800, 'sine', 0.8, 0.2); }, 300); },
+            craft: () => { sfx.play(400, 'triangle', 0.3, 0.1); setTimeout(() => { sfx.play(600, 'sawtooth', 0.3, 0.2); }, 200); setTimeout(() => { sfx.play(900, 'sine', 0.5, 0.3); }, 400); },
+            reveal: (p) => { sfx.play(p, 'sine', 0.4, 0.1); },
+            alert: () => { sfx.play(200, 'sawtooth', 0.2, 0.1); setTimeout(() => { sfx.play(250, 'sawtooth', 0.3, 0.1); }, 150); }
         };
 
         function notifyCenter(msg, btnText, btnAction) {
             let hub = document.getElementById('notification-hub'); 
-            
-            if(!hub) {
-                return; 
-            }
+            if(!hub) { return; }
             
             sfx.alert();
             
@@ -1042,20 +957,16 @@
             
             btn.onclick = () => { 
                 t.remove(); 
-                if(btnAction) {
-                    btnAction(); 
-                }
+                if(btnAction) { btnAction(); }
             };
             
             setTimeout(() => { 
-                if(t.parentElement) {
-                    t.remove(); 
-                }
+                if(t.parentElement) { t.remove(); }
             }, 8000);
         }
 
         // ==========================================
-        // 2. FIREBASE SETUP
+        // FIREBASE SETUP
         // ==========================================
         const firebaseConfig = {
             apiKey: "AIzaSyAActFtDrgVBq8wAOujPzETSDaU3nhtjhU",
@@ -1074,7 +985,7 @@
         const db = firebase.firestore();
 
         // ==========================================
-        // 3. DATA ARCHITECTURE: 1000 TOTAL ITEMS
+        // DATA ARCHITECTURE (1000 ITEMS COMPRESSED INTO ARRAYS)
         // ==========================================
         let cId = 1; 
         const ALL_COLORS = new Map(); 
@@ -1086,29 +997,17 @@
         };
         
         function getTierInfo(val) {
-            if(val < 500) {
-                return { r: "Common", x: "#aaa" }; 
-            }
-            if(val < 2500) {
-                return { r: "Uncommon", x: "#0f0" };
-            }
-            if(val < 15000) {
-                return { r: "Rare", x: "#08f" }; 
-            }
-            if(val < 60000) {
-                return { r: "Epic", x: "#a0f" };
-            }
-            if(val < 250000) {
-                return { r: "Legendary", x: "#f80" }; 
-            }
-            
+            if(val < 500) { return { r: "Common", x: "#aaa" }; }
+            if(val < 2500) { return { r: "Uncommon", x: "#0f0" }; }
+            if(val < 15000) { return { r: "Rare", x: "#08f" }; }
+            if(val < 60000) { return { r: "Epic", x: "#a0f" }; }
+            if(val < 250000) { return { r: "Legendary", x: "#f80" }; }
             return { r: "Mythical", x: "#f00" };
         }
 
         const PACK_PRICES = [];
         for(let i=0; i<60; i++) { 
-            let pVal = Math.floor(50 + (250 * i) + (400 * Math.pow(i, 2)) + (5 * Math.pow(i, 3)));
-            PACK_PRICES.push(pVal); 
+            PACK_PRICES.push(Math.floor(50 + (250 * i) + (400 * Math.pow(i, 2)) + (5 * Math.pow(i, 3)))); 
         }
 
         const PACK_DATA = [
@@ -1185,7 +1084,7 @@
                     name: c[0], 
                     hex: c[1], 
                     val: uniqueVal,
-                    source: `Standard Pack: ${p.n} Pack (Terminal)`
+                    source: `Standard Pack: ${p.n} Pack`
                 };
                 
                 POOL.std.push(inst); 
@@ -1251,7 +1150,7 @@
                     name: c[0], 
                     hex: c[1], 
                     val: Math.floor(150000 * Math.pow(1.5, j) + cId*25),
-                    source: `Anomaly Pack: ${p.n} Pack`
+                    source: `Anomaly Pack: ${p.n}`
                 }; 
                 
                 POOL.ev.push(inst); 
@@ -1279,19 +1178,8 @@
             return packItem;
         });
 
-        const ABILITY_TYPES = [
-            'steal', 'rob_cash', 'anomaly', 'duplicate', 
-            'midas', 'omni_pull', 'black_hole', 'shield'
-        ];
-        
-        const ABIL_NAMES = [
-            "Thief's", "Bandit", "Rogue", "Plunder", 
-            "Corrupt", "Glitch", "Hacker", "Virus", 
-            "Chaos", "Mirage", "Illusion", "Phantom", 
-            "Midas", "Golden", "Wealth", "Fortune", 
-            "Zenith", "Apex", "Omega", "Singularity", 
-            "Void", "Null", "Aegis", "Bulwark"
-        ];
+        const ABILITY_TYPES = ['steal', 'rob_cash', 'anomaly', 'duplicate', 'midas', 'omni_pull', 'black_hole', 'shield'];
+        const ABIL_NAMES = ["Thief's", "Bandit", "Rogue", "Plunder", "Corrupt", "Glitch", "Hacker", "Virus", "Chaos", "Mirage", "Illusion", "Phantom", "Midas", "Golden", "Wealth", "Fortune", "Zenith", "Apex", "Omega", "Singularity", "Void", "Null", "Aegis", "Bulwark"];
         
         ABIL_NAMES.forEach((n, i) => {
             let abil = ABILITY_TYPES[i % ABILITY_TYPES.length];
@@ -1348,26 +1236,15 @@
         }
 
         const N_POOLS = [[], []];
-        
         const np1Prefix = ["Time", "Space", "Reality", "Dimension", "Quantum", "Gravity"];
         const np1Suffix = ["Tear", "Rift", "Fracture", "Echo", "Loop"];
         let np1Names = []; 
-        
-        np1Prefix.forEach(p => {
-            np1Suffix.forEach(s => {
-                np1Names.push(`${p} ${s}`);
-            });
-        }); 
+        np1Prefix.forEach(p => { np1Suffix.forEach(s => { np1Names.push(`${p} ${s}`); }); }); 
         
         const np2Prefix = ["Despair", "Malice", "Greed", "Sorrow", "Wrath", "Chaos"];
         const np2Suffix = ["Blight", "Curse", "Bane", "Ruin", "Plague"];
         let np2Names = []; 
-        
-        np2Prefix.forEach(p => {
-            np2Suffix.forEach(s => {
-                np2Names.push(`${p} ${s}`);
-            });
-        }); 
+        np2Prefix.forEach(p => { np2Suffix.forEach(s => { np2Names.push(`${p} ${s}`); }); }); 
 
         np1Names.forEach((n, i) => { 
             let c1 = { 
@@ -1393,14 +1270,7 @@
             ALL_COLORS.set(c2.id, c2); 
         });
 
-        const SYNTH_NAMES = [
-            "Adamantium", "Mythril", "Orichalcum", "Vibranium", 
-            "Aetherium", "Neutronium", "Dark Energy", "Chroniton", 
-            "Graviton", "Tachyon Matrix", "Void Alloy", "Starmetal", 
-            "Phobium", "Xenon Glass", "Hyper-Carbon", "Tritium Glow", 
-            "Astral Core", "Oblivion Crystal", "Singularity Matter", "Nexus Essence"
-        ];
-        
+        const SYNTH_NAMES = ["Adamantium", "Mythril", "Orichalcum", "Vibranium", "Aetherium", "Neutronium", "Dark Energy", "Chroniton", "Graviton", "Tachyon Matrix", "Void Alloy", "Starmetal", "Phobium", "Xenon Glass", "Hyper-Carbon", "Tritium Glow", "Astral Core", "Oblivion Crystal", "Singularity Matter", "Nexus Essence"];
         SYNTH_NAMES.forEach((n, i) => { 
             let sC = { 
                 id: `C${cId++}`, 
@@ -1413,22 +1283,8 @@
             ALL_COLORS.set(sC.id, sC); 
         });
 
-        const exc1 = { 
-            id: `C${cId++}`, 
-            name: "Titanium White", 
-            hex: "#FFFFFF", 
-            val: 15000000,
-            source: `Omni-Zenith Pack / Jackpot`
-        }; 
-        
-        const exc2 = { 
-            id: `C${cId++}`, 
-            name: "Vantablack", 
-            hex: "#000000", 
-            val: 20000000,
-            source: `Omni-Zenith Pack / Jackpot`
-        };
-        
+        const exc1 = { id: `C${cId++}`, name: "Titanium White", hex: "#FFFFFF", val: 15000000, source: `Omni-Zenith Pack / Jackpot` }; 
+        const exc2 = { id: `C${cId++}`, name: "Vantablack", hex: "#000000", val: 20000000, source: `Omni-Zenith Pack / Jackpot` };
         POOL.exc.push(exc1, exc2); 
         ALL_COLORS.set(exc1.id, exc1); 
         ALL_COLORS.set(exc2.id, exc2);
@@ -1543,12 +1399,7 @@
             ALL_COLORS.set(packItem.id, packItem);
         });
 
-        const BOUNTY_NAMES = [
-            "Bounty Hunter Red", "Mercenary Green", "Tracker Blue", "Assassin Black", 
-            "Sniper Silver", "Contract Gold", "Outlaw Purple", "Ranger Brown", 
-            "Vigilante White", "Renegade Cyan"
-        ];
-        
+        const BOUNTY_NAMES = ["Bounty Hunter Red", "Mercenary Green", "Tracker Blue", "Assassin Black", "Sniper Silver", "Contract Gold", "Outlaw Purple", "Ranger Brown", "Vigilante White", "Renegade Cyan"];
         BOUNTY_NAMES.forEach((n, i) => {
             let c = { 
                 id: `C${cId++}`, 
@@ -1561,13 +1412,7 @@
             ALL_COLORS.set(c.id, c);
         });
 
-        const ORE_NAMES = [
-            "Iron Ore", "Copper Ore", "Silver Ore", "Gold Ore", "Platinum Ore", 
-            "Titanium Ore", "Cobalt Ore", "Palladium Ore", "Iridium Ore", "Osmium Ore", 
-            "Rhodium Ore", "Ruthenium Ore", "Mithril Ore", "Adamant Ore", "Orichalcum Ore", 
-            "Aetherium Ore", "Void Ore", "Quantum Ore", "Cosmic Ore", "Nexus Ore"
-        ];
-        
+        const ORE_NAMES = ["Iron Ore", "Copper Ore", "Silver Ore", "Gold Ore", "Platinum Ore", "Titanium Ore", "Cobalt Ore", "Palladium Ore", "Iridium Ore", "Osmium Ore", "Rhodium Ore", "Ruthenium Ore", "Mithril Ore", "Adamant Ore", "Orichalcum Ore", "Aetherium Ore", "Void Ore", "Quantum Ore", "Cosmic Ore", "Nexus Ore"];
         ORE_NAMES.forEach((n, i) => {
             let c = { 
                 id: `C${cId++}`, 
@@ -1580,13 +1425,7 @@
             ALL_COLORS.set(c.id, c);
         });
 
-        const HACKER_NAMES = [
-            "Rootkit Green", "Firewall Red", "Trojan Black", "Worm Purple", "Malware Orange", 
-            "Spyware Grey", "Keylogger Cyan", "Botnet Blue", "Ransomware Gold", "Phish White", 
-            "Spoof Silver", "Logic Bomb Yellow", "Zero-Day Magenta", "Exploit Indigo", 
-            "Backdoor Teal", "Payload Pink", "DDoS Crimson"
-        ];
-        
+        const HACKER_NAMES = ["Rootkit Green", "Firewall Red", "Trojan Black", "Worm Purple", "Malware Orange", "Spyware Grey", "Keylogger Cyan", "Botnet Blue", "Ransomware Gold", "Phish White", "Spoof Silver", "Logic Bomb Yellow", "Zero-Day Magenta", "Exploit Indigo", "Backdoor Teal", "Payload Pink", "DDoS Crimson"];
         HACKER_NAMES.forEach((n, i) => {
             let c = { 
                 id: `C${cId++}`, 
@@ -1599,12 +1438,7 @@
             ALL_COLORS.set(c.id, c);
         });
 
-        const DIVIDEND_NAMES = [
-            "Dividend Emerald", "Interest Gold", "Vault Platinum", "Yield Silver", 
-            "Equity Bronze", "Asset Diamond", "Capital Sapphire", "Bond Ruby", 
-            "Credit Topaz", "Trust Onyx"
-        ];
-        
+        const DIVIDEND_NAMES = ["Dividend Emerald", "Interest Gold", "Vault Platinum", "Yield Silver", "Equity Bronze", "Asset Diamond", "Capital Sapphire", "Bond Ruby", "Credit Topaz", "Trust Onyx"];
         DIVIDEND_NAMES.forEach((n, i) => {
             let c = { 
                 id: `C${cId++}`, 
@@ -1618,7 +1452,6 @@
         });
 
         const COLLIDER_NAMES = Array.from({length: 40}, (_, i) => `Collider Shard ${i+1}`);
-        
         COLLIDER_NAMES.forEach((n, i) => {
             let c = { 
                 id: `C${cId++}`, 
@@ -1631,10 +1464,8 @@
             ALL_COLORS.set(c.id, c);
         });
 
-        const TOTAL_COLORS = ALL_COLORS.size; 
-
         // ==========================================
-        // GAME STATE & CORE LOGIC
+        // GAME STATE & CORE LOGIC (FULLY UNCOMPRESSED)
         // ==========================================
         let state = { 
             name: "", 
@@ -1696,7 +1527,6 @@
             sfx.click(); 
         }
 
-        // --- LEVELING SYSTEM ---
         function addXp(amt) {
             state.xp += amt; 
             let reqXp = state.lvl * 100;
@@ -1725,7 +1555,6 @@
             syncDB();
         }
 
-        // --- BOUNTY SYSTEM ---
         function refreshBounty() {
             let randomTarget = POOL.std[Math.floor(Math.random() * POOL.std.length)];
             
@@ -1777,7 +1606,6 @@
             }
         }
 
-        // --- SYNTHESIS LAB ---
         function openSynthLab() { 
             let ov = document.getElementById('synth-overlay'); 
             
@@ -1919,7 +1747,6 @@
             }, 1000);
         }
 
-        // --- THE COLLIDER ---
         function openCollider() {
             closeOverlay('hub-overlay'); 
             closeOverlay('draft-overlay'); 
@@ -2035,9 +1862,9 @@
             }, 1000);
         }
 
-        // --- WORKSHOP CRAFTING ---
         function pseudoRandomGenerator(seedString) {
             let hash = 0;
+            
             for (let i = 0; i < seedString.length; i++) {
                 hash = Math.imul(31, hash) + seedString.charCodeAt(i) | 0;
             }
@@ -2054,68 +1881,94 @@
                 return;
             }
             
-            let rng = pseudoRandomGenerator(state.name + state.code);
-            state.recipes = [];
-            
-            let easyStd = POOL.std.slice(0, 180); 
-            let hardStd = POOL.std.slice(180, 360); 
-            let mixedRare = [...POOL.relics, ...POOL.casino, ...POOL.contraband];
+            try {
+                let seed = (state.name || "UNKNOWN") + (state.code || "UNKNOWN");
+                let rng = pseudoRandomGenerator(seed);
+                
+                state.recipes = [];
+                
+                let easyStd = POOL.std.slice(0, 180); 
+                let hardStd = POOL.std.slice(180, 360); 
+                let mixedRare = [...POOL.relics, ...POOL.casino, ...POOL.contraband];
 
-            POOL.craftPacks.forEach((item, i) => {
-                let reqs = [];
-                let poolsToDraw = [];
-
-                if (i < 5) {
-                    poolsToDraw = [easyStd, easyStd, easyStd];
-                } else if (i < 10) {
-                    poolsToDraw = [easyStd, easyStd, hardStd];
-                } else if (i < 15) {
-                    poolsToDraw = [easyStd, hardStd, hardStd];
-                } else if (i < 20) {
-                    poolsToDraw = [hardStd, hardStd, POOL.ev];
-                } else if (i < 23) {
-                    poolsToDraw = [hardStd, POOL.ev, mixedRare];
-                } else {
-                    poolsToDraw = [POOL.ev, POOL.rift, POOL.synthOut];
+                if(easyStd.length === 0 || hardStd.length === 0 || mixedRare.length === 0) {
+                    throw new Error("Pools are empty. Data generation failed.");
                 }
 
-                poolsToDraw.forEach(pool => {
-                    let pick = pool[rng() % pool.length];
-                    reqs.push({ 
-                        id: pick.id, 
-                        name: pick.name, 
-                        hex: pick.hex 
-                    });
-                });
+                POOL.craftPacks.forEach((item, i) => {
+                    let reqs = [];
+                    let poolsToDraw = [];
 
-                state.recipes.push({ 
-                    resultId: item.id, 
-                    reqs: reqs, 
-                    type: 'pack' 
+                    if (i < 5) {
+                        poolsToDraw = [easyStd, easyStd, easyStd];
+                    } else if (i < 10) {
+                        poolsToDraw = [easyStd, easyStd, hardStd];
+                    } else if (i < 15) {
+                        poolsToDraw = [easyStd, hardStd, hardStd];
+                    } else if (i < 20) {
+                        poolsToDraw = [hardStd, hardStd, POOL.ev];
+                    } else if (i < 23) {
+                        poolsToDraw = [hardStd, POOL.ev, mixedRare];
+                    } else {
+                        poolsToDraw = [POOL.ev, POOL.rift, POOL.synthOut];
+                    }
+
+                    poolsToDraw.forEach(pool => {
+                        if(pool && pool.length > 0) {
+                            let pick = pool[rng() % pool.length];
+                            
+                            if(pick) {
+                                reqs.push({ 
+                                    id: pick.id, 
+                                    name: pick.name, 
+                                    hex: pick.hex 
+                                });
+                            }
+                        }
+                    });
+
+                    if(reqs.length === 3) {
+                        state.recipes.push({ 
+                            resultId: item.id, 
+                            reqs: reqs, 
+                            type: 'pack' 
+                        });
+                    }
                 });
-            });
-            
-            EV_PACKS.forEach((item, i) => {
-                let reqs = [];
                 
-                let p1 = hardStd[rng() % hardStd.length];
-                reqs.push({ id: p1.id, name: p1.name, hex: p1.hex });
-                
-                let p2 = hardStd[rng() % hardStd.length];
-                reqs.push({ id: p2.id, name: p2.name, hex: p2.hex });
-                
-                let p3 = mixedRare[rng() % mixedRare.length];
-                reqs.push({ id: p3.id, name: p3.name, hex: p3.hex });
-                
-                state.recipes.push({ 
-                    resultId: item.id, 
-                    reqs: reqs, 
-                    type: 'anomaly', 
-                    anomalyIndex: i 
+                EV_PACKS.forEach((item, i) => {
+                    let reqs = [];
+                    
+                    let p1 = hardStd[rng() % hardStd.length];
+                    if(p1) {
+                        reqs.push({ id: p1.id, name: p1.name, hex: p1.hex });
+                    }
+                    
+                    let p2 = hardStd[rng() % hardStd.length];
+                    if(p2) {
+                        reqs.push({ id: p2.id, name: p2.name, hex: p2.hex });
+                    }
+                    
+                    let p3 = mixedRare[rng() % mixedRare.length];
+                    if(p3) {
+                        reqs.push({ id: p3.id, name: p3.name, hex: p3.hex });
+                    }
+                    
+                    if(reqs.length === 3) {
+                        state.recipes.push({ 
+                            resultId: item.id, 
+                            reqs: reqs, 
+                            type: 'anomaly', 
+                            anomalyIndex: i 
+                        });
+                    }
                 });
-            });
-            
-            state.recipesGenerated = true;
+                
+                state.recipesGenerated = true;
+                
+            } catch(e) {
+                console.error("Recipe generation failed:", e);
+            }
         }
 
         function openWorkshop() {
@@ -2189,6 +2042,11 @@
                 }
                 
                 let resItem = ALL_COLORS.get(rec.resultId);
+                
+                if(!resItem) {
+                    return;
+                }
+                
                 let tier = getTierInfo(resItem.val);
                 
                 let has1 = state.inv.findIndex(i => i.id === rec.reqs[0].id) > -1;
@@ -2265,7 +2123,6 @@
             }
         }
 
-        // --- THE UNDERWORLD ---
         function openUnderworld() {
             closeOverlay('hub-overlay'); 
             closeOverlay('draft-overlay'); 
@@ -2282,6 +2139,7 @@
             renderBlackMarket(); 
             
             let ov = document.getElementById('underworld-overlay'); 
+            
             if(ov) { 
                 ov.style.display = 'flex'; 
                 sfx.click(); 
@@ -2326,6 +2184,7 @@
             }
             
             let grid = document.getElementById('bm-grid'); 
+            
             if(!grid) {
                 return;
             }
@@ -2372,12 +2231,12 @@
         setInterval(() => { 
             bmItems = []; 
             let ov = document.getElementById('underworld-overlay');
+            
             if(ov && ov.style.display === 'flex') {
                 renderBlackMarket(); 
             }
         }, 120000);
 
-        // --- DIMENSIONAL GATEWAY ---
         function openGateway() {
             closeOverlay('hub-overlay'); 
             closeOverlay('draft-overlay'); 
@@ -2392,6 +2251,7 @@
             closeOverlay('collider-overlay');
             
             let ov = document.getElementById('gateway-overlay'); 
+            
             if(ov) { 
                 ov.style.display = 'flex'; 
                 sfx.click(); 
@@ -2413,6 +2273,7 @@
             expeditionActive = true;
             
             let btn = document.getElementById('btn-expedition'); 
+            
             if(btn) {
                 btn.innerText = "EXPLORING (60s)..."; 
                 btn.disabled = true;
@@ -2455,6 +2316,7 @@
             
             setTimeout(() => {
                 let chance = amt / 1000000;
+                
                 if(Math.random() < chance) { 
                     let c = POOL.rift[Math.floor(Math.random() * POOL.rift.length)]; 
                     pushToInv(c); 
@@ -2467,7 +2329,6 @@
             }, 1500);
         }
 
-        // --- ORBITAL MINING ---
         function openMining() {
             closeOverlay('hub-overlay'); 
             closeOverlay('draft-overlay'); 
@@ -2523,7 +2384,6 @@
             }, 2000);
         }
 
-        // --- NEXUS BANK ---
         function updateBankUI() {
             let bDisplay = document.getElementById('bank-balance-display');
             if(bDisplay) {
@@ -2547,6 +2407,7 @@
             updateBankUI();
             
             let ov = document.getElementById('bank-overlay'); 
+            
             if(ov) { 
                 ov.style.display = 'flex'; 
                 sfx.click(); 
@@ -2605,7 +2466,6 @@
             }
         }, 60000);
 
-        // --- CYBERNET HACKING ---
         function openCybernet() {
             closeOverlay('hub-overlay'); 
             closeOverlay('draft-overlay'); 
@@ -2620,6 +2480,7 @@
             closeOverlay('collider-overlay');
             
             let ov = document.getElementById('cybernet-overlay'); 
+            
             if(ov) { 
                 ov.style.display = 'flex'; 
                 sfx.click(); 
@@ -2635,6 +2496,7 @@
             sfx.synth();
             
             let log = document.getElementById('cyber-log');
+            
             if(log) {
                 log.innerHTML += "> BYPASSING FIREWALL...<br>";
                 log.scrollTop = log.scrollHeight;
@@ -2666,7 +2528,6 @@
             }, 1500);
         }
 
-        // --- CORE GAME LOBBY ---
         function hostGame() {
             try {
                 const name = document.getElementById('playerName').value.trim().toUpperCase(); 
@@ -2824,7 +2685,6 @@
                         notifyCenter(`INCOMING UPLINK FROM ${c.doc.data().p1}`, "VIEW", openIncomingTrades); 
                         updateTradeBadge(); 
                     }
-                    
                     if(c.type === 'removed' || c.doc.data().status !== 'pending') { 
                         delete pendingTradesCache[c.doc.id]; 
                         updateTradeBadge(); 
@@ -2839,13 +2699,11 @@
 
             setInterval(() => { 
                 let now = Date.now(); 
-                
                 Object.keys(pendingTradesCache).forEach(id => { 
                     if(now - pendingTradesCache[id].ts > 60000) { 
                         if(state.code) {
                             db.collection('games').doc(state.code).collection('trades').doc(id).update({status: 'cancelled'}); 
                         }
-                        
                         delete pendingTradesCache[id]; 
                         updateTradeBadge(); 
                     }
@@ -2960,9 +2818,6 @@
             }
         }
 
-        // ==========================================
-        // 5. 20 UNIQUE GLOBAL ANOMALIES
-        // ==========================================
         function handleGlobalEvent(data) {
             if(data.type !== "ANOMALY") return;
             
@@ -3106,6 +2961,7 @@
         }
 
         function pushToInv(c) {
+            if(!c) return;
             let t = getTierInfo(c.val);
             
             state.inv.push({ 
@@ -3128,203 +2984,108 @@
             syncInv();
         }
 
-        // ==========================================
-        // 8. ASYNC TRADING
-        // ==========================================
-        function acceptAsyncTrade(id) {
-            let t = pendingTradesCache[id]; 
+        function filterInventory() {
+            let searchInput = document.getElementById('inv-search-input');
+            let q = searchInput ? searchInput.value.toUpperCase() : "";
             
-            if(!t || !state.code) {
-                return; 
-            }
+            let grid = document.getElementById('inventory-grid');
+            if(!grid) return;
             
-            if(state.cash < t.o2.cash) {
-                return notifyCenter("INSUFFICIENT CREDITS", "DISMISS");
-            }
+            let cards = grid.getElementsByClassName('item-card');
             
-            let hasCols = t.o2.cols.every(req => state.inv.some(ic => ic.id === req.id)); 
-            if(!hasCols) {
-                return notifyCenter("MISSING COLORS", "DISMISS");
-            }
-
-            let them = state.players[t.p1]; 
-            if(!them) return;
-            
-            if(them.cash < t.o1.cash) {
-                return notifyCenter(`THEY LACK CREDITS`, "DISMISS");
-            }
-            
-            let theyHaveCols = t.o1.cols.every(off => them.items.includes(off.id)); 
-            
-            if(!theyHaveCols) {
-                return notifyCenter(`THEY LACK COLORS`, "DISMISS");
-            }
-
-            db.collection('games').doc(state.code).collection('trades').doc(id).update({status: 'completed'}); 
-            closeOverlay('incoming-overlay');
-            
-            updateCash(t.o1.cash - t.o2.cash);
-            
-            t.o2.cols.forEach(req => { 
-                let idx = state.inv.findIndex(i => i.id === req.id); 
-                if(idx > -1) {
-                    state.inv.splice(idx, 1); 
-                }
-            });
-            
-            t.o1.cols.forEach(off => { 
-                let fullColorData = ALL_COLORS.get(off.id);
-                
-                pushToInv({ 
-                    id: off.id, 
-                    name: off.name, 
-                    hex: off.hex, 
-                    val: off.val, 
-                    isAction: fullColorData.isAction, 
-                    ability: fullColorData.ability, 
-                    isNestedPack: fullColorData.isNestedPack, 
-                    poolId: fullColorData.poolId, 
-                    isCraftPack: fullColorData.isCraftPack, 
-                    nestedColors: fullColorData.nestedColors,
-                    source: fullColorData.source
-                }); 
-            }); 
-            
-            syncInv(); 
-            addXp(50); 
-
-            let newThemCash = them.cash - t.o1.cash + t.o2.cash; 
-            let newThemItems = [...them.items];
-            
-            t.o1.cols.forEach(off => { 
-                let idx = newThemItems.indexOf(off.id); 
-                if(idx > -1) {
-                    newThemItems.splice(idx, 1); 
-                }
-            }); 
-            
-            t.o2.cols.forEach(req => { 
-                newThemItems.push(req.id); 
-            });
-            
-            db.collection('games').doc(state.code).collection('players').doc(t.p1).update({ 
-                cash: newThemCash, 
-                items: newThemItems, 
-                invSize: new Set(newThemItems).size 
-            });
-            
-            notifyCenter("TRADE SUCCESSFUL", "DISMISS");
-        }
-
-        // ==========================================
-        // 9. V12.6 GLOBAL DEX SOURCE TRACKER
-        // ==========================================
-        function openGlobalDex() { 
-            const m = document.getElementById('dex-overlay'); 
-            const g = document.getElementById('global-dex-grid'); 
-            
-            if(!m || !g) return; 
-            
-            m.style.display = 'flex'; 
-            g.innerHTML = ''; 
-            
-            ALL_COLORS.forEach((c) => { 
-                let div = document.createElement('div'); 
-                div.className = 'dex-cell'; 
-                div.style.background = c.hex; 
-                div.style.opacity = state.dex.has(c.id) ? '1' : '0.15'; 
-                div.dataset.name = c.name.toUpperCase(); 
-                
-                div.onclick = () => { 
-                    let owners = Object.keys(state.players).filter(p => state.players[p].items && state.players[p].items.includes(c.id)); 
-                    let dhi = document.getElementById('dex-hover-info'); 
-                    
-                    if(dhi) {
-                        dhi.innerHTML = `
-                            <div>
-                                <span style="color:#fff; font-weight:bold; font-size:1.2rem;">${c.name}</span> - <span style="color:var(--gold); font-weight:bold;">$${c.val.toLocaleString()}</span><br>
-                                <span style="color:var(--cyan); font-size: 0.9rem;">SOURCE: ${c.source || "Unknown Origin"}</span><br>
-                                <span style="font-size: 0.8rem; color: #888;">Owned by: ${owners.length > 0 ? owners.join(', ') : 'None'}</span>
-                            </div>
-                        `; 
-                    }
-                }; 
-                
-                g.appendChild(div); 
-            }); 
-            
-            let sInput = document.getElementById('dex-search-input');
-            if(sInput) {
-                sInput.value = "";
-            }
-        }
-
-        function filterDex() {
-            let sInput = document.getElementById('dex-search-input');
-            let q = sInput ? sInput.value.toUpperCase() : "";
-            
-            let grid = document.getElementById('global-dex-grid');
-            if (!grid) return;
-            
-            let cells = grid.getElementsByClassName('dex-cell');
-            
-            for(let i=0; i<cells.length; i++) {
-                if (cells[i].dataset.name.includes(q)) {
-                    cells[i].classList.remove('hidden');
-                } else {
-                    cells[i].classList.add('hidden');
-                }
-            }
-        }
-
-        function triggerPersonalEvent(forceWager = false) { 
-            if(state.status !== 'active') return; 
-            
-            let wOver = document.getElementById('wager-overlay'); 
-            if(!wOver) return; 
-            
-            if (!forceWager && Math.random() > 0.5) return; 
-            
-            sfx.alert(); 
-            wOver.style.display = 'flex'; 
-            
-            const bBox = document.getElementById('wager-buttons'); 
-            
-            if(!bBox) return; 
-            
-            bBox.innerHTML = ''; 
-            
-            ["Common", "Uncommon", "Rare", "Epic", "Legendary", "Mythical"].forEach(r => { 
-                let btn = document.createElement('button'); 
-                btn.innerText = r; 
-                btn.style.borderColor = "#aaa"; 
-                
-                btn.onclick = () => { 
-                    closeOverlay('wager-overlay'); 
-                    
-                    if(state.cash < 5000) {
-                        return notifyCenter("INSUFFICIENT FUNDS ($5k)", "DISMISS"); 
-                    }
-                    
-                    updateCash(-5000); 
-                    
-                    let pool = Array.from(ALL_COLORS.values()); 
-                    let actual = getTierInfo(pool[Math.floor(Math.random() * pool.length)].val).r; 
-                    
-                    if(r === actual) { 
-                        notifyCenter(`WAGER WON! Drawn: ${actual}`, "CLAIM", () => { 
-                            updateCash(50000); 
-                            addXp(20); 
-                        }); 
+            state.inv.forEach((item, i) => {
+                if (cards[i]) {
+                    if (item.name.toUpperCase().includes(q)) {
+                        cards[i].style.display = 'flex';
                     } else {
-                        notifyCenter(`WAGER LOST. Drawn: ${actual}`, "DISMISS"); 
+                        cards[i].style.display = 'none';
                     }
-                }; 
-                
-                bBox.appendChild(btn); 
-            }); 
+                }
+            });
         }
 
+        function syncInv() {
+            state.dex.clear(); 
+            state.inv.forEach(i => state.dex.add(i.id));
+            
+            let uc = document.getElementById('unique-count'); 
+            if(uc) {
+                uc.innerText = state.dex.size;
+            }
+            
+            let hdr = document.getElementById('dex-owned-text-header'); 
+            if(hdr) {
+                hdr.innerText = `${state.dex.size}/${TOTAL_COLORS}`;
+            }
+            
+            syncDB();
+            
+            if(state.dex.size >= TOTAL_COLORS && state.isHost && state.code) { 
+                db.collection('games').doc(state.code).update({status: 'ended'}); 
+            }
+            
+            const g = document.getElementById('inventory-grid'); 
+            if(!g) return; 
+            
+            g.innerHTML = '';
+            
+            let sInput = document.getElementById('inv-search-input');
+            let q = sInput ? sInput.value.toUpperCase() : "";
+
+            state.inv.forEach((item, idx) => {
+                const c = document.createElement('div'); 
+                c.className = 'item-card'; 
+                c.style.borderColor = item.x;
+                
+                if(q && !item.name.toUpperCase().includes(q)) {
+                    c.style.display = 'none';
+                }
+
+                let sellVal = Math.floor(item.val * state.sellMod);
+                let useBtn = (item.isAction || item.isNestedPack) ? `<button class="btn-action" onclick="useItem(${idx}, event)">USE ITEM</button>` : '';
+                
+                c.innerHTML = `
+                    <div class="swatch" style="background:${item.hex};"></div>
+                    <p style="font-size:0.65rem; color:#fff;">${item.name}</p>
+                    ${useBtn} 
+                    <button style="font-size:0.65rem; padding:6px; margin-top:5px; width:100%; border-color:#555;" onclick="sellColor(${idx}, event)">SELL $${sellVal.toLocaleString()}</button>
+                `;
+                
+                g.appendChild(c);
+            });
+            
+            if(state.recipesGenerated) {
+                let craftOv = document.getElementById('craft-overlay');
+                if(craftOv && craftOv.style.display === 'flex') {
+                    renderWorkshop();
+                }
+            }
+        }
+
+        function sellColor(idx, e) { 
+            e.stopPropagation(); 
+            let c = state.inv[idx]; 
+            sfx.sell(); 
+            updateCash(Math.floor(c.val * state.sellMod)); 
+            state.inv.splice(idx,1); 
+            syncInv(); 
+        }
+
+        function syncDB() { 
+            if(state.code) { 
+                db.collection('games').doc(state.code).collection('players').doc(state.name).update({ 
+                    cash: state.cash, 
+                    bankCash: state.bankCash,
+                    invSize: state.dex.size, 
+                    lastAcq: Date.now(), 
+                    items: Array.from(state.dex) 
+                }); 
+            } 
+        }
+
+        // ==========================================
+        // END GAME
+        // ==========================================
         async function endGame() {
             clearInterval(loop); 
             
