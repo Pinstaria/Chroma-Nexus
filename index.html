@@ -2656,54 +2656,89 @@ function claimBounty() {
             });
         }
 
-        function acceptAsyncTrade(id) {
-            let t = pendingTradesCache[id]; if(!t || !state.code) return; 
+function acceptAsyncTrade(id) {
+            let t = pendingTradesCache[id]; 
+            if (!t || !state.code) return; 
             
-            if(state.cash < t.o2.cash) { return notifyCenter("INSUFFICIENT CREDITS", "DISMISS"); }
+            if (state.cash < t.o2.cash) { 
+                return notifyCenter("INSUFFICIENT CREDITS", "DISMISS"); 
+            }
+            
             let hasCols = t.o2.cols.every(req => state.inv.some(ic => ic.id === req.id)); 
-            if(!hasCols) { return notifyCenter("MISSING COLORS", "DISMISS"); }
+            if (!hasCols) { 
+                return notifyCenter("MISSING COLORS", "DISMISS"); 
+            }
 
-            let them = state.players[t.p1]; if(!them) return;
+            let them = state.players[t.p1]; 
+            if (!them) return;
             
-            if(them.cash < t.o1.cash) { return notifyCenter(`THEY LACK CREDITS`, "DISMISS"); }
+            if (them.cash < t.o1.cash) { 
+                return notifyCenter(`THEY LACK CREDITS`, "DISMISS"); 
+            }
+            
             let theyHaveCols = t.o1.cols.every(off => them.items.includes(off.id)); 
-            if(!theyHaveCols) { return notifyCenter(`THEY LACK COLORS`, "DISMISS"); }
+            if (!theyHaveCols) { 
+                return notifyCenter(`THEY LACK COLORS`, "DISMISS"); 
+            }
 
-            db.collection('games').doc(state.code).collection('trades').doc(id).update({status: 'completed'}); 
-            openMenu('');
+            db.collection('games').doc(state.code).collection('trades').doc(id).update({
+                status: 'completed'
+            }); 
             
+            openMenu('');
             updateCash(t.o1.cash - t.o2.cash);
             
             t.o2.cols.forEach(req => { 
                 let idx = state.inv.findIndex(i => i.id === req.id); 
-                if(idx > -1) { state.inv.splice(idx, 1); } 
+                if (idx > -1) { 
+                    state.inv.splice(idx, 1); 
+                } 
             });
             
             t.o1.cols.forEach(off => { 
                 let fullColorData = ALL_COLORS.get(off.id);
-                pushToInv({ 
-                    id: off.id, name: off.name, hex: off.hex, val: off.val, 
-                    isAction: fullColorData.isAction, ability: fullColorData.ability, 
-                    isNestedPack: fullColorData.isNestedPack, poolId: fullColorData.poolId, 
-                    isCraftPack: fullColorData.isCraftPack, nestedColors: fullColorData.nestedColors, source: fullColorData.source 
-                }); 
+                if (fullColorData) {
+                    pushToInv({ 
+                        id: off.id, 
+                        name: off.name, 
+                        hex: off.hex, 
+                        val: off.val, 
+                        isAction: fullColorData.isAction, 
+                        ability: fullColorData.ability, 
+                        isNestedPack: fullColorData.isNestedPack, 
+                        poolId: fullColorData.poolId, 
+                        isCraftPack: fullColorData.isCraftPack, 
+                        nestedColors: fullColorData.nestedColors, 
+                        source: fullColorData.source 
+                    }); 
+                }
             }); 
             
-            syncInv(); addXp(50); 
+            syncInv(); 
+            addXp(50); 
 
-            let newThemCash = them.cash - t.o1.cash + t.o2.cash; 
-            let newThemItems = [...them.items];
-            
-            t.o1.cols.forEach(off => { 
-                let idx = newThemItems.indexOf(off.id); 
-                if(idx > -1) { newThemItems.splice(idx, 1); } 
-            }); 
-            
-            t.o2.cols.forEach(req => { newThemItems.push(req.id); });
-            
-            db.collection('games').doc(state.code).collection('players').doc(t.p1).update({ 
-                cash: newThemCash, items: newThemItems, invSize: new Set(newThemItems).size 
-            });
+            // FIX: Only forcefully update the DB if the sender is an AI Bot without a client
+            if (them.isBot) {
+                let newThemCash = them.cash - t.o1.cash + t.o2.cash; 
+                let newThemItems = [...them.items];
+                
+                t.o1.cols.forEach(off => { 
+                    let idx = newThemItems.indexOf(off.id); 
+                    if (idx > -1) { 
+                        newThemItems.splice(idx, 1); 
+                    } 
+                }); 
+                
+                t.o2.cols.forEach(req => { 
+                    newThemItems.push(req.id); 
+                });
+                
+                db.collection('games').doc(state.code).collection('players').doc(t.p1).update({ 
+                    cash: newThemCash, 
+                    items: newThemItems, 
+                    invSize: new Set(newThemItems).size 
+                });
+            }
             
             notifyCenter("TRADE SUCCESSFUL", "DISMISS");
         }
@@ -2853,6 +2888,52 @@ function claimBounty() {
                         if(inc && inc.style.display === 'flex') { openIncomingTrades(); } 
                     }
                 }); 
+            }));
+            subs.push(db.collection('games').doc(code).collection('trades').where('p1', '==', name).where('status', '==', 'completed').onSnapshot(s => {
+                s.docChanges().forEach(c => {
+                    if (c.type === 'added' || c.type === 'modified') {
+                        let t = c.doc.data();
+                        
+                        // FIX: If trade is accepted and hasn't been locally processed yet
+                        if (!t.p1Processed) {
+                            updateCash(t.o2.cash - t.o1.cash);
+                            
+                            // Remove what you offered
+                            t.o1.cols.forEach(off => {
+                                let idx = state.inv.findIndex(i => i.id === off.id);
+                                if (idx > -1) {
+                                    state.inv.splice(idx, 1);
+                                }
+                            });
+                            
+                            // Add what you requested
+                            t.o2.cols.forEach(req => {
+                                let fullColorData = ALL_COLORS.get(req.id);
+                                if (fullColorData) {
+                                    pushToInv({ 
+                                        id: req.id, 
+                                        name: req.name, 
+                                        hex: req.hex, 
+                                        val: req.val, 
+                                        isAction: fullColorData.isAction, 
+                                        ability: fullColorData.ability, 
+                                        isNestedPack: fullColorData.isNestedPack, 
+                                        poolId: fullColorData.poolId, 
+                                        isCraftPack: fullColorData.isCraftPack, 
+                                        nestedColors: fullColorData.nestedColors, 
+                                        source: fullColorData.source 
+                                    });
+                                }
+                            });
+                            
+                            syncInv();
+                            notifyCenter(`UPLINK ACCEPTED BY ${t.p2}!`, "AWESOME");
+                            
+                            // Mark processed so the listener doesn't loop
+                            c.doc.ref.update({ p1Processed: true });
+                        }
+                    }
+                });
             }));
 
             setInterval(() => { 
