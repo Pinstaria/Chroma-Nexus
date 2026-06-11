@@ -1502,6 +1502,7 @@
         let subs = []; 
         let loop; 
         let pendingTradesCache = {}; 
+        let outgoingTradesCache = {}; 
         let lastTradeSent = 0; 
         let anomalyLock = false;
         let activeBounty = null; 
@@ -2036,7 +2037,7 @@ function claimBounty() {
                     case 'anomaly': 
                         anomalyLock = true; 
                         db.collection('games').doc(state.code).collection('events').add({ 
-                            type: "ANOMALY", eId: Math.floor(Math.random()*20)+1, ts: Date.now() 
+                            type: "ANOMALY", eId: Math.floor(Math.random()*31)+1, ts: Date.now() 
                         }); 
                         setTimeout(() => { anomalyLock = false; }, 3000); 
                         break;
@@ -2557,6 +2558,48 @@ function claimBounty() {
                 }
             }, 1500);
         }
+        // ==========================================
+        // ROGUE WAGER / PERSONAL EVENT
+        // ==========================================
+        function triggerPersonalEvent(forceWager = false) { 
+            if(state.status !== 'active') return; 
+            
+            if (!forceWager && Math.random() > 0.5) return; 
+            
+            openMenu('wager-overlay');
+            const bBox = document.getElementById('wager-buttons'); 
+            if(!bBox) return; 
+            
+            bBox.innerHTML = ''; 
+            ["Common", "Uncommon", "Rare", "Epic", "Legendary", "Mythical"].forEach(r => { 
+                let btn = document.createElement('button'); 
+                btn.innerText = r; 
+                btn.style.borderColor = "#aaa"; 
+                
+                btn.onclick = () => { 
+                    openMenu('');
+                    
+                    if(state.cash < 5000) {
+                        return notifyCenter("INSUFFICIENT FUNDS ($5k)", "DISMISS"); 
+                    }
+                    
+                    updateCash(-5000); 
+                    
+                    let pool = Array.from(ALL_COLORS.values()); 
+                    let actual = getTierInfo(pool[Math.floor(Math.random() * pool.length)].val).r; 
+                    
+                    if(r === actual) { 
+                        notifyCenter(`WAGER WON! Drawn: ${actual}`, "CLAIM", () => { 
+                            updateCash(50000); 
+                            addXp(20); 
+                        }); 
+                    } else {
+                        notifyCenter(`WAGER LOST. Drawn: ${actual}`, "DISMISS"); 
+                    }
+                }; 
+                bBox.appendChild(btn); 
+            }); 
+        }
 
         // ==========================================
         // NETWORKING & ASYNC TRADING
@@ -2649,27 +2692,68 @@ function sendDraftOffer() {
         }
 
         function openIncomingTrades() {
-            const list = document.getElementById('incoming-list'); if(!list) return; list.innerHTML = '';
-            let keys = Object.keys(pendingTradesCache); 
-            if(keys.length === 0) { return list.innerHTML = "<p style='color:#888;'>No pending transmissions.</p>"; }
+            const list = document.getElementById('incoming-list'); 
+            if(!list) return; 
             
-            keys.forEach(id => {
-                let d = pendingTradesCache[id]; let el = document.createElement('div'); el.className = 'glass';
+            list.innerHTML = '';
+            let inKeys = Object.keys(pendingTradesCache); 
+            let outKeys = Object.keys(outgoingTradesCache);
+            
+            if(inKeys.length === 0 && outKeys.length === 0) {
+                return list.innerHTML = "<p style='color:#888;'>No pending transmissions.</p>";
+            }
+            
+            // Render Incoming Trades
+            inKeys.forEach(id => {
+                let d = pendingTradesCache[id]; 
+                let el = document.createElement('div'); 
+                el.className = 'glass';
+                
                 let offCols = d.o1.cols.map(c => `<span style="color:${c.x||'#fff'}">${c.name}</span>`).join(', ') || 'None'; 
                 let reqCols = d.o2.cols.map(c => `<span style="color:${c.x||'#fff'}">${c.name}</span>`).join(', ') || 'None';
                 
                 el.innerHTML = `
-                    <h3>OFFER FROM: [${d.p1}]</h3>
+                    <h3 style="color:var(--gold);">OFFER FROM: [${d.p1}]</h3>
                     <div style="margin:10px 0; background:rgba(0,0,0,0.5); padding:10px; border-left: 3px solid var(--cyan);">
-                        <p style="color:var(--cyan); font-weight:bold;">THEY GIVE YOU:</p><p>$${d.o1.cash.toLocaleString()} CREDITS & ${offCols}</p>
+                        <p style="color:var(--cyan); font-weight:bold;">THEY GIVE YOU:</p>
+                        <p>$${d.o1.cash.toLocaleString()} CREDITS & ${offCols}</p>
                     </div>
                     <div style="margin:10px 0; background:rgba(0,0,0,0.5); padding:10px; border-left: 3px solid var(--pink);">
-                        <p style="color:var(--pink); font-weight:bold;">THEY WANT FROM YOU:</p><p>$${d.o2.cash.toLocaleString()} CREDITS & ${reqCols}</p>
+                        <p style="color:var(--pink); font-weight:bold;">THEY WANT FROM YOU:</p>
+                        <p>$${d.o2.cash.toLocaleString()} CREDITS & ${reqCols}</p>
                     </div>
                     <div style="display:flex; gap:10px;">
                         <button class="btn-pink" onclick="acceptAsyncTrade('${id}')">ACCEPT & SWAP</button>
                         <button onclick="cancelTradeDoc('${id}')" style="border-color:#555; color:#555;">DECLINE</button>
-                    </div>`;
+                    </div>
+                `;
+                list.appendChild(el);
+            });
+
+            // Render Outgoing Trades
+            outKeys.forEach(id => {
+                let d = outgoingTradesCache[id]; 
+                let el = document.createElement('div'); 
+                el.className = 'glass';
+                el.style.borderColor = "#555";
+                
+                let offCols = d.o1.cols.map(c => `<span style="color:${c.x||'#fff'}">${c.name}</span>`).join(', ') || 'None'; 
+                let reqCols = d.o2.cols.map(c => `<span style="color:${c.x||'#fff'}">${c.name}</span>`).join(', ') || 'None';
+                
+                el.innerHTML = `
+                    <h3 style="color:#888;">OUTGOING TO: [${d.p2}] (PENDING)</h3>
+                    <div style="margin:10px 0; background:rgba(0,0,0,0.5); padding:10px; border-left: 3px solid #888;">
+                        <p style="color:#aaa; font-weight:bold;">YOU OFFERED:</p>
+                        <p style="color:#aaa;">$${d.o1.cash.toLocaleString()} CREDITS & ${offCols}</p>
+                    </div>
+                    <div style="margin:10px 0; background:rgba(0,0,0,0.5); padding:10px; border-left: 3px solid #888;">
+                        <p style="color:#aaa; font-weight:bold;">YOU REQUESTED:</p>
+                        <p style="color:#aaa;">$${d.o2.cash.toLocaleString()} CREDITS & ${reqCols}</p>
+                    </div>
+                    <div style="display:flex; gap:10px;">
+                        <button onclick="cancelTradeDoc('${id}')" style="border-color:var(--alert); color:var(--alert);">CANCEL SENT DRAFT</button>
+                    </div>
+                `;
                 list.appendChild(el);
             });
         }
@@ -2988,7 +3072,7 @@ function acceptAsyncTrade(id) {
             if(ev <= 0 && state.isHost && left > 0 && !anomalyLock && state.code) {
                 anomalyLock = true; let fq = parseInt(document.getElementById('eventFreq').value) * 60000;
                 db.collection('games').doc(state.code).update({ nextEv: Date.now() + fq });
-                db.collection('games').doc(state.code).collection('events').add({ type: "ANOMALY", eId: Math.floor(Math.random() * 20) + 1, ts: Date.now() });
+                db.collection('games').doc(state.code).collection('events').add({ type: "ANOMALY", eId: Math.floor(Math.random() * 31) + 1, ts: Date.now() });
                 setTimeout(() => { anomalyLock = false; }, 3000);
             }
             
@@ -3018,6 +3102,18 @@ function acceptAsyncTrade(id) {
                 case 18: state.inv = state.inv.sort(() => Math.random() - 0.5); syncInv(); notifyCenter("DIMENSIONAL SHIFT: Inventory Scrambled.", "DISMISS"); break;
                 case 19: let sx = N_POOLS[Math.floor(Math.random()*2)][Math.floor(Math.random()*30)]; pushToInv(sx); notifyCenter(`SINGULARITY SHARD: ${sx.name}`, "CLAIM"); break;
                 case 20: default: let shuffled = [...EV_PACKS].sort(() => 0.5 - Math.random()); state.localAnomalies = shuffled.slice(0, 6); state.evActive = true; renderStore(); notifyCenter("ANOMALY: 6 RARE PACKS IN TERMINAL!", "VIEW", () => { openMenu('dex-overlay'); openGlobalDex(); }); setTimeout(() => { state.evActive = false; state.localAnomalies = []; renderStore(); notifyCenter("Anomaly Dissipated.", "DISMISS"); }, 60000); break;
+                case 21: default: let shuffled = [...EV_PACKS].sort(() => 0.5 - Math.random()); state.localAnomalies = shuffled.slice(0, 6); state.evActive = true; renderStore(); notifyCenter("ANOMALY: 6 RARE PACKS IN TERMINAL!", "VIEW", () => { openMenu('dex-overlay'); openGlobalDex(); }); setTimeout(() => { state.evActive = false; state.localAnomalies = []; renderStore(); notifyCenter("Anomaly Dissipated.", "DISMISS"); }, 60000); break;
+                case 22: default: let shuffled = [...EV_PACKS].sort(() => 0.5 - Math.random()); state.localAnomalies = shuffled.slice(0, 6); state.evActive = true; renderStore(); notifyCenter("ANOMALY: 6 RARE PACKS IN TERMINAL!", "VIEW", () => { openMenu('dex-overlay'); openGlobalDex(); }); setTimeout(() => { state.evActive = false; state.localAnomalies = []; renderStore(); notifyCenter("Anomaly Dissipated.", "DISMISS"); }, 60000); break;
+                case 23: default: let shuffled = [...EV_PACKS].sort(() => 0.5 - Math.random()); state.localAnomalies = shuffled.slice(0, 6); state.evActive = true; renderStore(); notifyCenter("ANOMALY: 6 RARE PACKS IN TERMINAL!", "VIEW", () => { openMenu('dex-overlay'); openGlobalDex(); }); setTimeout(() => { state.evActive = false; state.localAnomalies = []; renderStore(); notifyCenter("Anomaly Dissipated.", "DISMISS"); }, 60000); break;
+                case 24: default: let shuffled = [...EV_PACKS].sort(() => 0.5 - Math.random()); state.localAnomalies = shuffled.slice(0, 6); state.evActive = true; renderStore(); notifyCenter("ANOMALY: 6 RARE PACKS IN TERMINAL!", "VIEW", () => { openMenu('dex-overlay'); openGlobalDex(); }); setTimeout(() => { state.evActive = false; state.localAnomalies = []; renderStore(); notifyCenter("Anomaly Dissipated.", "DISMISS"); }, 60000); break;
+                case 25: default: let shuffled = [...EV_PACKS].sort(() => 0.5 - Math.random()); state.localAnomalies = shuffled.slice(0, 6); state.evActive = true; renderStore(); notifyCenter("ANOMALY: 6 RARE PACKS IN TERMINAL!", "VIEW", () => { openMenu('dex-overlay'); openGlobalDex(); }); setTimeout(() => { state.evActive = false; state.localAnomalies = []; renderStore(); notifyCenter("Anomaly Dissipated.", "DISMISS"); }, 60000); break;
+                case 26: default: let shuffled = [...EV_PACKS].sort(() => 0.5 - Math.random()); state.localAnomalies = shuffled.slice(0, 6); state.evActive = true; renderStore(); notifyCenter("ANOMALY: 6 RARE PACKS IN TERMINAL!", "VIEW", () => { openMenu('dex-overlay'); openGlobalDex(); }); setTimeout(() => { state.evActive = false; state.localAnomalies = []; renderStore(); notifyCenter("Anomaly Dissipated.", "DISMISS"); }, 60000); break;
+                case 27: default: let shuffled = [...EV_PACKS].sort(() => 0.5 - Math.random()); state.localAnomalies = shuffled.slice(0, 6); state.evActive = true; renderStore(); notifyCenter("ANOMALY: 6 RARE PACKS IN TERMINAL!", "VIEW", () => { openMenu('dex-overlay'); openGlobalDex(); }); setTimeout(() => { state.evActive = false; state.localAnomalies = []; renderStore(); notifyCenter("Anomaly Dissipated.", "DISMISS"); }, 60000); break;
+                case 28: default: let shuffled = [...EV_PACKS].sort(() => 0.5 - Math.random()); state.localAnomalies = shuffled.slice(0, 6); state.evActive = true; renderStore(); notifyCenter("ANOMALY: 6 RARE PACKS IN TERMINAL!", "VIEW", () => { openMenu('dex-overlay'); openGlobalDex(); }); setTimeout(() => { state.evActive = false; state.localAnomalies = []; renderStore(); notifyCenter("Anomaly Dissipated.", "DISMISS"); }, 60000); break;
+                case 29: default: let shuffled = [...EV_PACKS].sort(() => 0.5 - Math.random()); state.localAnomalies = shuffled.slice(0, 6); state.evActive = true; renderStore(); notifyCenter("ANOMALY: 6 RARE PACKS IN TERMINAL!", "VIEW", () => { openMenu('dex-overlay'); openGlobalDex(); }); setTimeout(() => { state.evActive = false; state.localAnomalies = []; renderStore(); notifyCenter("Anomaly Dissipated.", "DISMISS"); }, 60000); break;
+                case 30: default: let shuffled = [...EV_PACKS].sort(() => 0.5 - Math.random()); state.localAnomalies = shuffled.slice(0, 6); state.evActive = true; renderStore(); notifyCenter("ANOMALY: 6 RARE PACKS IN TERMINAL!", "VIEW", () => { openMenu('dex-overlay'); openGlobalDex(); }); setTimeout(() => { state.evActive = false; state.localAnomalies = []; renderStore(); notifyCenter("Anomaly Dissipated.", "DISMISS"); }, 60000); break;
+                case 31: default: let shuffled = [...EV_PACKS].sort(() => 0.5 - Math.random()); state.localAnomalies = shuffled.slice(0, 6); state.evActive = true; renderStore(); notifyCenter("ANOMALY: 6 RARE PACKS IN TERMINAL!", "VIEW", () => { openMenu('dex-overlay'); openGlobalDex(); }); setTimeout(() => { state.evActive = false; state.localAnomalies = []; renderStore(); notifyCenter("Anomaly Dissipated.", "DISMISS"); }, 60000); break;
+            }      
             }
         }
 
