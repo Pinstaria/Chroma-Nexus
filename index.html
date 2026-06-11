@@ -1609,6 +1609,56 @@
                 }); 
             } 
         }
+        // ==========================================
+// BOUNTY BOARD SYSTEM
+// ==========================================
+function refreshBounty() {
+    let randomTarget = POOL.std[Math.floor(Math.random() * POOL.std.length)];
+    
+    activeBounty = { 
+        id: randomTarget.id, 
+        name: randomTarget.name, 
+        reward: randomTarget.val * 3 
+    };
+    
+    let btn = document.getElementById('bounty-target-name'); 
+    if(btn) {
+        btn.innerText = activeBounty.name;
+    }
+    
+    let btr = document.getElementById('bounty-target-reward'); 
+    if(btr) {
+        btr.innerText = "$" + activeBounty.reward.toLocaleString() + " + 50 XP";
+    }
+}
+
+function claimBounty() {
+    if(!activeBounty) return;
+    
+    let idx = state.inv.findIndex(i => i.id === activeBounty.id);
+    
+    if(idx > -1) {
+        state.inv.splice(idx, 1); 
+        updateCash(activeBounty.reward); 
+        addXp(50); 
+        
+        // 25% Chance for a Bounty Exclusive color
+        if (Math.random() < 0.25) {
+            let bc = POOL.bounty[Math.floor(Math.random() * POOL.bounty.length)];
+            pushToInv(bc);
+            notifyCenter(`BOUNTY CLAIMED: +Reward & Rare ${bc.name}!`, "NICE"); 
+        } else {
+            notifyCenter("BOUNTY CLAIMED: Reward Deposited", "NICE"); 
+        }
+        
+        syncInv(); 
+        sfx.buy();
+        refreshBounty();
+    } else { 
+        notifyCenter("YOU DO NOT POSSESS THE TARGET COLOR", "DISMISS"); 
+        sfx.alert(); 
+    }
+}
 
         // ==========================================
         // INVENTORY & DEX
