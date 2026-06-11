@@ -1588,9 +1588,11 @@
             
             syncDB();
         }
-
         function updateCash(amt) { 
-            state.cash += amt; 
+            let safeAmt = Number(amt) || 0;
+            state.cash = Number(state.cash) || 0;
+            state.cash += safeAmt; 
+            
             let hc = document.getElementById('hud-cash'); 
             if(hc) { 
                 hc.innerText = state.cash.toLocaleString(); 
@@ -2618,15 +2620,31 @@ function claimBounty() {
         function addDraftRequest(id) { let c = ALL_COLORS.get(id); if(c && !draftRequest.cols.find(x => x.id === c.id)) { let tier = getTierInfo(c.val); draftRequest.cols.push({ id: c.id, name: c.name, hex: c.hex, val: c.val, r: tier.r, x: tier.x }); sfx.click(); renderDraftUI(); } }
         function removeDraftRequest(i) { draftRequest.cols.splice(i,1); sfx.click(); renderDraftUI(); }
 
-        function sendDraftOffer() {
-            let dmc = document.getElementById('draft-my-cash'); draftOffer.cash = dmc ? (parseInt(dmc.value) || 0) : 0;
-            if(draftOffer.cash > state.cash) { return notifyCenter("INSUFFICIENT CREDITS", "DISMISS"); }
-            let dtc = document.getElementById('draft-their-cash'); draftRequest.cash = dtc ? (parseInt(dtc.value) || 0) : 0;
+function sendDraftOffer() {
+            let dmc = document.getElementById('draft-my-cash'); 
+            draftOffer.cash = dmc ? (Number(dmc.value) || 0) : 0;
             
-            lastTradeSent = Date.now(); openMenu(''); notifyCenter(`Uplink sent to ${draftTarget}`, "OK");
+            if(draftOffer.cash > state.cash) { 
+                return notifyCenter("INSUFFICIENT CREDITS", "DISMISS"); 
+            }
+            
+            let dtc = document.getElementById('draft-their-cash'); 
+            draftRequest.cash = dtc ? (Number(dtc.value) || 0) : 0;
+            
+            lastTradeSent = Date.now(); 
+            openMenu(''); 
+            notifyCenter(`Uplink sent to ${draftTarget}`, "OK");
             
             if(state.code) { 
-                db.collection('games').doc(state.code).collection('trades').add({ p1: state.name, p2: draftTarget, status: 'pending', type: 'async', ts: Date.now(), o1: draftOffer, o2: draftRequest }); 
+                db.collection('games').doc(state.code).collection('trades').add({ 
+                    p1: state.name, 
+                    p2: draftTarget, 
+                    status: 'pending', 
+                    type: 'async', 
+                    ts: Date.now(), 
+                    o1: draftOffer, 
+                    o2: draftRequest 
+                }); 
             }
         }
 
@@ -2658,58 +2676,51 @@ function claimBounty() {
 
 function acceptAsyncTrade(id) {
             let t = pendingTradesCache[id]; 
-            if (!t || !state.code) return; 
+            if(!t || !state.code) return; 
             
-            if (state.cash < t.o2.cash) { 
+            let o1Cash = Number(t.o1.cash) || 0;
+            let o2Cash = Number(t.o2.cash) || 0;
+            
+            if(state.cash < o2Cash) { 
                 return notifyCenter("INSUFFICIENT CREDITS", "DISMISS"); 
             }
             
             let hasCols = t.o2.cols.every(req => state.inv.some(ic => ic.id === req.id)); 
-            if (!hasCols) { 
+            if(!hasCols) { 
                 return notifyCenter("MISSING COLORS", "DISMISS"); 
             }
 
             let them = state.players[t.p1]; 
-            if (!them) return;
+            if(!them) return;
             
-            if (them.cash < t.o1.cash) { 
+            if(them.cash < o1Cash) { 
                 return notifyCenter(`THEY LACK CREDITS`, "DISMISS"); 
             }
             
             let theyHaveCols = t.o1.cols.every(off => them.items.includes(off.id)); 
-            if (!theyHaveCols) { 
+            if(!theyHaveCols) { 
                 return notifyCenter(`THEY LACK COLORS`, "DISMISS"); 
             }
 
-            db.collection('games').doc(state.code).collection('trades').doc(id).update({
-                status: 'completed'
-            }); 
-            
+            db.collection('games').doc(state.code).collection('trades').doc(id).update({status: 'completed'}); 
             openMenu('');
-            updateCash(t.o1.cash - t.o2.cash);
+            
+            // Add the net cash difference to the acceptor's balance
+            updateCash(o1Cash - o2Cash);
             
             t.o2.cols.forEach(req => { 
                 let idx = state.inv.findIndex(i => i.id === req.id); 
-                if (idx > -1) { 
-                    state.inv.splice(idx, 1); 
-                } 
+                if(idx > -1) { state.inv.splice(idx, 1); } 
             });
             
             t.o1.cols.forEach(off => { 
                 let fullColorData = ALL_COLORS.get(off.id);
-                if (fullColorData) {
+                if(fullColorData) {
                     pushToInv({ 
-                        id: off.id, 
-                        name: off.name, 
-                        hex: off.hex, 
-                        val: off.val, 
-                        isAction: fullColorData.isAction, 
-                        ability: fullColorData.ability, 
-                        isNestedPack: fullColorData.isNestedPack, 
-                        poolId: fullColorData.poolId, 
-                        isCraftPack: fullColorData.isCraftPack, 
-                        nestedColors: fullColorData.nestedColors, 
-                        source: fullColorData.source 
+                        id: off.id, name: off.name, hex: off.hex, val: off.val, 
+                        isAction: fullColorData.isAction, ability: fullColorData.ability, 
+                        isNestedPack: fullColorData.isNestedPack, poolId: fullColorData.poolId, 
+                        isCraftPack: fullColorData.isCraftPack, nestedColors: fullColorData.nestedColors, source: fullColorData.source 
                     }); 
                 }
             }); 
@@ -2717,26 +2728,19 @@ function acceptAsyncTrade(id) {
             syncInv(); 
             addXp(50); 
 
-            // FIX: Only forcefully update the DB if the sender is an AI Bot without a client
             if (them.isBot) {
-                let newThemCash = them.cash - t.o1.cash + t.o2.cash; 
+                let newThemCash = Number(them.cash) - o1Cash + o2Cash; 
                 let newThemItems = [...them.items];
                 
                 t.o1.cols.forEach(off => { 
                     let idx = newThemItems.indexOf(off.id); 
-                    if (idx > -1) { 
-                        newThemItems.splice(idx, 1); 
-                    } 
+                    if(idx > -1) { newThemItems.splice(idx, 1); } 
                 }); 
                 
-                t.o2.cols.forEach(req => { 
-                    newThemItems.push(req.id); 
-                });
+                t.o2.cols.forEach(req => { newThemItems.push(req.id); });
                 
                 db.collection('games').doc(state.code).collection('players').doc(t.p1).update({ 
-                    cash: newThemCash, 
-                    items: newThemItems, 
-                    invSize: new Set(newThemItems).size 
+                    cash: newThemCash, items: newThemItems, invSize: new Set(newThemItems).size 
                 });
             }
             
