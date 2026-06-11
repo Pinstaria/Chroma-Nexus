@@ -1649,6 +1649,246 @@
         // ==========================================
         // UI & OVERLAYS 
         // ==========================================
+        // ==========================================
+// MISSING CORE VARIABLES & FUNCTIONS FIX
+// ==========================================
+
+const TOTAL_COLORS = 1000;
+let draftTarget = null;
+let draftOffer = { cash: 0, cols: [] };
+let draftRequest = { cash: 0, cols: [] };
+
+function updateCash(amt) {
+    state.cash += amt;
+    let hudCash = document.getElementById('hud-cash');
+    if (hudCash) {
+        hudCash.innerText = state.cash.toLocaleString();
+    }
+    syncDB();
+}
+
+function updateTradeBadge() {
+    let badge = document.getElementById('trade-badge');
+    if (!badge) return;
+    
+    let count = Object.keys(pendingTradesCache).length;
+    badge.innerText = count;
+    badge.style.display = count > 0 ? 'inline-block' : 'none';
+}
+
+function renderStore() {
+    let sg = document.getElementById('store-grid');
+    if (!sg) return;
+    
+    sg.innerHTML = '';
+    let packsToRender = [...STD_PACKS];
+
+    // Append local anomalies if an event is active
+    if (state.evActive && state.localAnomalies.length > 0) {
+        packsToRender = packsToRender.concat(state.localAnomalies);
+    }
+
+    packsToRender.forEach((pack) => {
+        let isEvent = pack.isEvent;
+        let cost = Math.floor(pack.cost * state.discountMod);
+        let canAfford = state.cash >= cost;
+
+        let c = document.createElement('div');
+        c.className = 'item-card';
+        if (isEvent) {
+            c.style.borderColor = "var(--pink)";
+            c.style.boxShadow = "0 0 10px rgba(255,0,85,0.2)";
+        }
+
+        c.innerHTML = `
+            <h3 style="font-size:1.1rem; color:${isEvent ? 'var(--pink)' : 'var(--cyan)'}; margin-bottom:10px;">${pack.name}</h3>
+            <button class="${isEvent ? 'btn-pink' : ''}" style="width:100%; font-size:1rem; padding:10px;" ${!canAfford ? 'disabled' : ''} onclick="buyPack('${pack.id}', ${cost})">
+                BUY $${cost.toLocaleString()}
+            </button>
+        `;
+        sg.appendChild(c);
+    });
+}
+
+function buyPack(packId, cost) {
+    if (state.cash < cost) {
+        return notifyCenter("INSUFFICIENT CREDITS", "DISMISS");
+    }
+
+    let pack = STD_PACKS.find(p => p.id === packId) || EV_PACKS.find(p => p.id === packId);
+    if (!pack) return;
+
+    updateCash(-cost);
+    sfx.buy();
+
+    // Draw 3 random colors from the pack
+    let drawn = [];
+    for(let i=0; i<3; i++) {
+        let c = pack.colors[Math.floor(Math.random() * pack.colors.length)];
+        drawn.push(c);
+        pushToInv(c);
+    }
+
+    // Handle UI Overlay
+    let ov = document.getElementById('pack-overlay');
+    let title = document.getElementById('pack-title');
+    let cards = document.getElementById('pack-cards');
+    let btn = document.getElementById('btn-pack-close');
+
+    if (ov && cards && title && btn) {
+        ov.style.display = 'flex';
+        title.innerText = pack.name.toUpperCase() + " CACHE ACQUIRED";
+        cards.innerHTML = '';
+        btn.style.display = 'none';
+
+        drawn.forEach((c, i) => {
+            let card = document.createElement('div');
+            card.className = 'card-3d';
+            let tier = getTierInfo(c.val);
+            
+            card.innerHTML = `
+                <div class="card-face card-back"></div>
+                <div class="card-face card-front" style="border-color:${tier.x}">
+                    <div class="swatch" style="background:${c.hex}; height:70px;"></div>
+                    <h4 style="color:${tier.x}; margin:10px 0; font-size:0.8rem;">${c.name}</h4>
+                    <p style="color:#aaa; font-size:0.7rem;">$${c.val.toLocaleString()}</p>
+                </div>
+            `;
+            cards.appendChild(card);
+
+            // Staggered flip animation
+            setTimeout(() => {
+                card.classList.add('revealed');
+                sfx.reveal(400 + (i * 200));
+                if (i === 2) {
+                    setTimeout(() => btn.style.display = 'inline-block', 500);
+                }
+            }, 300 + (i * 400));
+        });
+    }
+}
+
+function useItem(idx, e) {
+    e.stopPropagation();
+    let item = state.inv[idx];
+
+    if (item.isNestedPack) {
+        state.inv.splice(idx, 1);
+        sfx.use();
+        let rewards = [];
+        
+        // Determine reward pool based on pack type
+        if (item.isCraftPack && item.nestedColors) {
+            rewards = [item.nestedColors[Math.floor(Math.random() * item.nestedColors.length)]];
+        } else if (item.poolId !== undefined) {
+            for(let i=0; i<3; i++) {
+                rewards.push(N_POOLS[item.poolId][Math.floor(Math.random()*N_POOLS[item.poolId].length)]);
+            }
+        } else if (item.nestedColors) {
+            for(let i=0; i<3; i++) {
+                rewards.push(item.nestedColors[Math.floor(Math.random()*item.nestedColors.length)]);
+            }
+        }
+        
+        rewards.forEach(r => pushToInv(r));
+        notifyCenter(`CACHE OPENED: Extracted ${rewards.length} items!`, "SWEET");
+        syncInv();
+        
+    } else if (item.isAction) {
+        state.inv.splice(idx, 1);
+        sfx.use();
+        
+        // Handle ability types
+        if (item.ability === 'steal') {
+            updateCash(50000);
+            notifyCenter(`ACTION EXECUTED: Siphoned $50,000!`, "AWESOME");
+        } else if (item.ability === 'midas') {
+            updateCash(100000);
+            notifyCenter(`ACTION EXECUTED: Transmuted $100,000!`, "AWESOME");
+        } else if (item.ability === 'shield') {
+            state.shield = true;
+            notifyCenter(`ACTION EXECUTED: Aegis Shield Active!`, "AWESOME");
+        } else {
+            addXp(250);
+            notifyCenter(`ACTION EXECUTED: Gained 250 XP!`, "AWESOME");
+        }
+        syncInv();
+    }
+}
+
+function acceptAsyncTrade(id) {
+    let d = pendingTradesCache[id];
+    if (!d) return;
+
+    if (state.cash < d.o2.cash) {
+        return notifyCenter("INSUFFICIENT CREDITS TO ACCEPT", "DISMISS");
+    }
+
+    // Verify player still has requested items
+    let hasAll = true;
+    let tempInv = [...state.inv];
+    let toRemoveIdx = [];
+
+    for (let req of d.o2.cols) {
+        let foundIdx = tempInv.findIndex(i => i.id === req.id);
+        if (foundIdx > -1) {
+            toRemoveIdx.push(foundIdx);
+            tempInv[foundIdx] = null; // nullify to handle duplicate requests correctly
+        } else {
+            hasAll = false;
+            break;
+        }
+    }
+
+    if (!hasAll) {
+        return notifyCenter("YOU NO LONGER POSSESS THE REQUESTED ITEMS", "DISMISS");
+    }
+
+    // Execute Trade
+    updateCash(-d.o2.cash);
+    updateCash(d.o1.cash);
+
+    let finalToRemove = [];
+    for (let req of d.o2.cols) {
+        let idx = state.inv.findIndex(i => i.id === req.id && !finalToRemove.includes(i));
+        if (idx > -1) finalToRemove.push(idx);
+    }
+
+    finalToRemove.sort((a,b)=>b-a).forEach(idx => {
+        state.inv.splice(idx, 1);
+    });
+
+    d.o1.cols.forEach(c => pushToInv(c));
+
+    if(state.code) {
+        db.collection('games').doc(state.code).collection('trades').doc(id).update({status: 'completed'});
+    }
+
+    delete pendingTradesCache[id];
+    updateTradeBadge();
+    syncInv();
+
+    let inc = document.getElementById('incoming-overlay');
+    if (inc && inc.style.display === 'flex') {
+        openIncomingTrades();
+    }
+
+    sfx.buy();
+    notifyCenter("UPLINK COMPLETE. ASSETS TRANSFERRED.", "ACKNOWLEDGE");
+}
+
+function triggerPersonalEvent(isGlobalTrigger) {
+    sfx.alert();
+    if (Math.random() > 0.5) {
+        let windfall = Math.floor(Math.random() * 25000) + 10000;
+        updateCash(windfall);
+        notifyCenter(`PERSONAL ANOMALY: Discovered $${windfall.toLocaleString()} in dormant account.`, "NICE");
+    } else {
+        let c = POOL.high[Math.floor(Math.random() * POOL.high.length)];
+        pushToInv(c);
+        notifyCenter(`PERSONAL ANOMALY: Found Rare Item ${c.name}!`, "NICE");
+    }
+}
         function openTradeHub() { 
             let overlay = document.getElementById('hub-overlay'); 
             if(!overlay) return; 
